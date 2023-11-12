@@ -62,3 +62,30 @@ a, .btn-link {
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
+
+    /*Add Wagen Page*/
+.available-item{
+    background-color:gray;
+}
+.selected-item {
+    background-color: dimgrey;
+}
+
+ul.materialsMainItems {
+    list-style-type: none;
+    margin-bottom: 2px;
+}
+ul.materialsAddedItems {
+    list-style-type: none;
+    margin-bottom: 2px;
+}
+
+.addedMaterilasList {
+    background-color: burlywood;
+    width: 25%;
+}
+
+.materilasMainList{
+    background-color:green;
+    width:25%;
+}
