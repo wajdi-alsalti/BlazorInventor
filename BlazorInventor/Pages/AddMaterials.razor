@@ -1,0 +1,57 @@
+﻿@page "/AddMaterials"
+@inject IMaterialsData materialsData
+<h3>Add Materials</h3>
+<EditForm Context="addMaterialsForm" OnValidSubmit="AddNewMaterial" Model="newMaterial">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div>
+        <label id="materialName">Materila Name</label>
+    </div>
+    <div >
+        <input class="form-control" type="text" placeholder="Material Name" for="materialName" @bind-value="newMaterial.Name" />
+    </div>
+    <div>
+        <label id="materialName">Sap Number</label>
+    </div>
+    <div >
+        <input class="form-control" type="number" placeholder="Material Sap Number" @bind-value="newMaterial.SapNumber" />
+    </div>
+    <div>
+        <label>Material Image</label>
+    </div>
+    <div style="border:1px solid gray;">
+        <img src="images/productionLine.png" alt="material image" width="300" height="300"/>
+        @* <form action="/action_page.php">
+            <label for="img">Select image:</label>
+            <input type="file" id="img" name="img" accept="image/*">
+            <input type="submit">
+        </form> *@
+    </div>
+    <div>
+        <label>Quantity in Single Box</label>
+    </div>
+    <div >
+        <input class="form-control" type="number" placeholder="Quantity" @bind-value="newMaterial.Quantity" />
+    </div>
+    <div>
+        <button type="submit" class="btn btn-primary mt-2">Add Material</button>
+    </div>
+</EditForm>
+
+@code {
+    private MaterialsUIModel newMaterial = new();
+
+
+
+    private async void AddNewMaterial()
+    {
+        MaterialsModel material = new MaterialsModel()
+            {
+                Name = newMaterial.Name,
+                SapNumber = newMaterial.SapNumber,
+                Quantity = newMaterial.Quantity,
+                Image = newMaterial.Image
+            };
+        await materialsData.CreateMaterial(material);
+    }
+}

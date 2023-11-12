@@ -1,0 +1,107 @@
+﻿@page "/AddWagen"
+
+@inject IMaterialsData materialsData
+@inject ISingleWagenData singleWagen
+
+<h3>AddWagen</h3>
+
+<EditForm Model="newWagenModel" OnValidSubmit="AddWagenDB">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+        <div class="row">
+            <div class="col">
+                <div class="mb-3">
+                    <label for="wagen">Wagen Name</label>
+                    <InputText id="wagen" class="form-control" placeholder="Add Wagen name" @bind-Value=newWagenModel.Name />
+                </div>
+                <div class="mb-3">
+                    <label for="materials" >Materials List</label>
+                    @if (materilasList is not null)
+                    {
+                    <ul class="list-group">
+                            @foreach (var item in materilasList)
+                            {
+                            <li class="list-group-item list-group-item-primary" @onclick="(()=> ItemAddToListClicked(item))">@item.Name</li>
+                            }
+                        </ul>
+                    }
+                </div>
+                <div class="mb-3">
+                    <label for="materialsadded">add Materials to List</label>
+                    @if (addedmaterilasList is not null)
+                    {
+                    <ul class="list-group">
+                            @foreach (var item in addedmaterilasList)
+                            {
+                            <li class="list-group-item list-group-item-success" @onclick="(()=> ItemRemoveFromListClicked(item))">@item.Name</li>
+                            }
+                        </ul>
+                    }
+                </div>
+                <div class="center-children">
+                <button type="submit" class="btn btn-primary"> Add Wagen</button>
+                </div>
+            </div>
+        </div>
+</EditForm>
+@code {
+    private List<MaterialsModel> materilasList;
+    private List<MaterialsModel> addedmaterilasList = new();
+
+    private WagensUiModel newWagenModel = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var materials = await materialsData.GetMaterialAsync();
+
+        materilasList = materials;
+
+    }
+
+    private async void AddWagenDB()
+    {
+        List<BasicMaterialsModel> basicMaterials = new();
+        BandsModel newBand = new();
+        newBand.Id = newWagenModel.Id;
+        foreach (var item in addedmaterilasList)
+        {
+            basicMaterials.Add(new BasicMaterialsModel(item));
+        }
+        SingleWagenModel single = new();
+        
+        single.WagenMaterials = basicMaterials;
+        single.Name = newWagenModel.Name;
+        await singleWagen.CreateWagenTest(single);
+        newWagenModel = new();
+    }
+
+    private void ItemAddToListClicked(MaterialsModel materialsUI)
+    {
+        
+        if (addedmaterilasList is not null)
+        {
+            addedmaterilasList.Add(materialsUI);
+
+        }
+
+        if (materilasList is not null)
+        {
+            materilasList.Remove(materialsUI);
+        }
+    }
+    private void ItemRemoveFromListClicked(MaterialsModel materialsUI)
+    {
+        
+        if (materilasList is not null)
+        {
+            materilasList.Add(materialsUI);
+        }
+
+        if (addedmaterilasList is not null)
+        {
+            addedmaterilasList.Remove(materialsUI);
+        }
+    }
+
+    
+}
