@@ -1,21 +1,35 @@
 ﻿using DBInventorLibrary.Models.Bands;
+using DBInventorLibrary.Models.MaterialsModels;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace DBInventorLibrary.DataAccess
 {
     public class BandsData : IBandsData
     {
         private readonly IMongoCollection<BandsModel> _bands;
-        public BandsData(IDbConnection db)
+        private readonly IMemoryCache _cahce;
+        private const string CacheName = "BandsData";
+        public BandsData(IDbConnection db, IMemoryCache cahce)
         {
             _bands = db.BandsCollection;
+            _cahce = cahce;
         }
 
         #region get Band info from DB
 
         public async Task<List<BandsModel>> GetBandAsync()
         {
-            var result = await _bands.FindAsync(_ => true);
-            return result.ToList();
+            List<BandsModel> output;
+            output = _cahce.Get<List<BandsModel>>(CacheName);
+            if (output == null)
+            {
+                var result = await _bands.FindAsync(_ => true);
+                output = result.ToList();
+
+                // how long the data will be in memory
+                _cahce.Set(CacheName, output, TimeSpan.FromMinutes(1));
+            }
+            return output;
         }
 
         public async Task<BandsModel> GetBand(string id)

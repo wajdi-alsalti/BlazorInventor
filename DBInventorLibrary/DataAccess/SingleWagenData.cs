@@ -1,22 +1,39 @@
 ﻿using DBInventorLibrary.Models.WagensModel;
 using MongoDB.Driver;
+using Microsoft.Extensions.Caching.Memory;
+using System.Collections.Generic;
 
 namespace DBInventorLibrary.DataAccess
 {
     public class SingleWagenData : ISingleWagenData
     {
         private readonly IMongoCollection<SingleWagenModel> _wagens;
-        public SingleWagenData(IDbConnection db)
+        private readonly IMemoryCache _cahce;
+
+        private const string CacheName = "WagensData";
+
+
+        public SingleWagenData(IDbConnection db,IMemoryCache cahce)
         {
             _wagens = db.SingleWagenCollection;
+            _cahce = cahce;
         }
 
         #region get wagen info from DB
 
         public async Task<List<SingleWagenModel>> GetWagenAsync()
         {
-            var result = await _wagens.FindAsync(_ => true);
-            return result.ToList();
+            List<SingleWagenModel> output;
+            output = _cahce.Get<List<SingleWagenModel>>(CacheName);
+            if (output == null)
+            {
+                var result = await _wagens.FindAsync(_ => true);
+                output = result.ToList();
+
+                // how long the data will be in memory
+                _cahce.Set(CacheName,output,TimeSpan.FromMinutes(1));
+            }
+            return output;
         }
 
         public async Task<SingleWagenModel> GetWagen(string id)

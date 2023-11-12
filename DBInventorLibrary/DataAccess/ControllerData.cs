@@ -1,21 +1,34 @@
 ﻿using DBInventorLibrary.Models.ControllerModels;
+using DBInventorLibrary.Models.MaterialsModels;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace DBInventorLibrary.DataAccess
 {
     public class ControllerData : IControllerData
     {
         private readonly IMongoCollection<ControllerModel> _controller;
-        public ControllerData(IDbConnection db)
+        private readonly IMemoryCache _cahce;
+        private const string CacheName = "ControllersData";
+        public ControllerData(IDbConnection db, IMemoryCache cahce)
         {
             _controller = db.ControllerCollection;
+            _cahce = cahce;
         }
 
         #region get controller info from DB
 
         public async Task<List<ControllerModel>> GetControllerAsync()
         {
-            var result = await _controller.FindAsync(_ => true);
-            return result.ToList();
+            List<ControllerModel> output;
+            output = _cahce.Get<List<ControllerModel>>(CacheName);
+            if (output == null)
+            {
+                var result = await _controller.FindAsync(_ => true);
+                output = result.ToList();
+                // how long the data will be in memory
+                _cahce.Set(CacheName, output, TimeSpan.FromMinutes(1));
+            }
+            return output;
         }
 
         public async Task<ControllerModel> GetController(string id)

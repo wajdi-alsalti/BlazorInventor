@@ -1,21 +1,35 @@
 ﻿using DBInventorLibrary.Models.MaterialsModels;
+using DBInventorLibrary.Models.WagensModel;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace DBInventorLibrary.DataAccess
 {
     public class MaterialsData : IMaterialsData
     {
         private readonly IMongoCollection<MaterialsModel> _materials;
-        public MaterialsData(IDbConnection db)
+        private readonly IMemoryCache _cahce;
+        private const string CacheName = "MaterialsData";
+        public MaterialsData(IDbConnection db, IMemoryCache cahce)
         {
             _materials = db.MaterialsCollection;
+            _cahce = cahce;
         }
 
         #region get wagen info from DB
 
         public async Task<List<MaterialsModel>> GetMaterialAsync()
         {
-            var result = await _materials.FindAsync(_ => true);
-            return result.ToList();
+            List<MaterialsModel> output;
+            output = _cahce.Get<List<MaterialsModel>>(CacheName);
+            if (output == null)
+            {
+                var result = await _materials.FindAsync(_ => true);
+                output = result.ToList();
+
+                // how long the data will be in memory
+                _cahce.Set(CacheName, output, TimeSpan.FromMinutes(1));
+            }
+            return output;
         }
 
         public async Task<MaterialsModel> GetMaterial(string id)
