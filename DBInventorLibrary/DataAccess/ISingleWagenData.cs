@@ -1,0 +1,12 @@
+﻿using DBInventorLibrary.Models.WagensModel;
+
+namespace DBInventorLibrary.DataAccess
+{
+    public interface ISingleWagenData
+    {
+        Task CreateWagenTest(SingleWagenModel wagen);
+        Task<SingleWagenModel> GetWagen(string id);
+        Task<List<SingleWagenModel>> GetWagenAsync();
+        Task UpadteWagen(SingleWagenModel wagen);
+    }
+}
