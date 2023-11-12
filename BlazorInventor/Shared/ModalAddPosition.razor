@@ -1,0 +1,70 @@
+﻿﻿@if (ShowBox)
+{
+    <div class="modal fade show d-block" id="exampleModel" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@Title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="()=> OnChoiceChange(wagenDetail)"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <p>@Message</p>
+                    <input type="number" placeholder="Position Number" @onchange="WagenPositionSelected"/>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="()=> OnChoiceChange(wagenDetail)">Cancel</button>
+                    <button type="button" class="btn btn-primary" @onclick="()=> OnChoiceChange(wagenDetail)">Add Position</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = "Add Position";
+
+    [Parameter]
+    public string Message { get; set; } = "Are You Sure You Want to Add Position";
+
+    [Parameter]
+    public int Position { get; set; }
+    /// <summary>
+    /// trigger to show the dialog or hide
+    /// </summary>
+    public bool ShowBox { get; set; }
+
+    [Parameter]
+    public SingleWagenModel wagenDetail { get; set; }
+
+    /// <summary>
+    /// If user click cancel is false ,delete is true
+    /// </summary>
+    [Parameter]
+    public EventCallback<SingleWagenModel> UserChoise { get; set; }
+
+
+    public void Show(string msg)
+    {
+        Message = msg;
+        ShowBox = true;
+        StateHasChanged();
+    }
+
+    protected async Task OnChoiceChange(SingleWagenModel value)
+    {
+        ShowBox = false;
+        value.Position = Position;
+        await UserChoise.InvokeAsync(value);
+    }
+
+    private void WagenPositionSelected(ChangeEventArgs e)
+    {
+        // take the value from the input
+        Position = int.Parse(e.Value.ToString());
+    }
+}
