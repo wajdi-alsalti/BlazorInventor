@@ -1,5 +1,6 @@
 ﻿@page "/AddMaterials"
 @inject IMaterialsData materialsData
+@inject IConfiguration config
 <h3>Add Materials</h3>
 <EditForm Context="addMaterialsForm" OnValidSubmit="AddNewMaterial" Model="newMaterial">
     <DataAnnotationsValidator />
@@ -20,12 +21,18 @@
         <label>Material Image</label>
     </div>
     <div style="border:1px solid gray;">
-        <img src="images/productionLine.png" alt="material image" width="300" height="300"/>
-        @* <form action="/action_page.php">
-            <label for="img">Select image:</label>
-            <input type="file" id="img" name="img" accept="image/*">
-            <input type="submit">
-        </form> *@
+        @*accept the file we want to upload but not force it to not uplaod*@
+        <InputFile OnChange="@LoadFile" class="form-control" accept=".png,.jpg,.jpeg"/>
+        @if (errors.Count > 0)
+        {
+            <h2>Errors</h2>
+            <ul class="text-danger">
+                @foreach (var error in errors)
+                {
+                    <li>@error</li>
+                }
+            </ul>
+        }
     </div>
     <div>
         <label>Quantity in Single Box</label>
@@ -41,17 +48,73 @@
 @code {
     private MaterialsUIModel newMaterial = new();
 
+    private string ImageName = "";
 
+    private long maxFileSize = 1024 * 1024 * 3; // it is 3 mb
+    private int maxAllowedFiles = 1;
+    private List<string> errors = new();
+
+    private IBrowserFile? file;
+
+    // private async Task LoadFile(InputFileChangeEventArgs e)
+    private void LoadFile(InputFileChangeEventArgs e)
+    {
+        file = e.File;
+    }
+
+    private async Task<string> CaptureFile()
+    {
+        if (file is null)
+        {
+            return "";
+        }
+
+        try
+        {
+            // create a new name to file to do not mess with name files or double it
+            string newFileName = Path.ChangeExtension(Path.GetRandomFileName(), Path.GetExtension(file.Name));
+
+            string relativePath = Path.Combine("materialsImage", newFileName);
+
+            ImageName = newFileName;
+
+            // path to directory FileStorage in appsettings and folder name is materialsImage
+            // the path will be C:\\Users\\wajdi\\OneDrive\\Desktop\\storgeFile\\materialsImage\\nameOfFile
+            //C:\Users\wajdi\source\repos\BlazorInventor\BlazorInventor\wwwroot\
+            string path = Path.Combine(config.GetValue<string>("FileStorage"), "materialsImage", newFileName);
+
+            // create the folder materialsImage if it is not created at the folder path
+            Directory.CreateDirectory(Path.Combine(config.GetValue<string>("FileStorage"), "materialsImage"));
+
+            await using FileStream fs = new(path, FileMode.Create);
+
+            await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
+
+            return relativePath;
+        }
+        catch (Exception ex)
+        {
+            errors.Add($"File: {file.Name} Error : {ex.Message}");
+            throw;
+        }
+
+
+    }
 
     private async void AddNewMaterial()
     {
+        string relativePath = await CaptureFile();
         MaterialsModel material = new MaterialsModel()
             {
                 Name = newMaterial.Name,
                 SapNumber = newMaterial.SapNumber,
                 Quantity = newMaterial.Quantity,
-                Image = newMaterial.Image
+                Image = relativePath
             };
         await materialsData.CreateMaterial(material);
+
+        newMaterial = new();
+        file = null;
+        errors.Clear(); 
     }
 }
