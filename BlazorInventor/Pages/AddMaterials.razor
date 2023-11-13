@@ -1,7 +1,12 @@
 ﻿@page "/AddMaterials"
 @inject IMaterialsData materialsData
 @inject IConfiguration config
+
+
 <h3>Add Materials</h3>
+
+<ModalWarrning @ref="modalWarrning" />
+
 <EditForm Context="addMaterialsForm" OnValidSubmit="AddNewMaterial" Model="newMaterial">
     <DataAnnotationsValidator />
     <ValidationSummary />
@@ -56,7 +61,11 @@
 
     private IBrowserFile? file;
 
-    // private async Task LoadFile(InputFileChangeEventArgs e)
+    /// <summary>
+    /// refernce for dialog
+    /// </summary>
+    private ModalWarrning modalWarrning { get; set; }
+
     private void LoadFile(InputFileChangeEventArgs e)
     {
         file = e.File;
@@ -101,7 +110,7 @@
 
     }
 
-    private async void AddNewMaterial()
+    private async Task AddNewMaterial()
     {
         string relativePath = await CaptureFile();
         MaterialsModel material = new MaterialsModel()
@@ -111,10 +120,38 @@
                 Quantity = newMaterial.Quantity,
                 Image = relativePath
             };
-        await materialsData.CreateMaterial(material);
+
+        if (await CheckIfItemSaved(material) == true)
+        {
+            await materialsData.CreateMaterial(material);
+        }
+        else
+        {
+            ShowDialog($"Sap Number {material?.SapNumber} or Article Name '{material?.Name}' already in Data Base!!");
+        }
 
         newMaterial = new();
         file = null;
         errors.Clear(); 
+    }
+
+    private async Task<bool> CheckIfItemSaved(MaterialsModel material)
+    {
+        var materialsInDB = await materialsData.GetMaterialAsync();
+        // max number of the sapNumber in DB
+        var maxSapNumber = materialsInDB.Max(s => s.SapNumber);
+
+        var filterName = materialsInDB.Where(n => n.Name == material.Name).FirstOrDefault();
+        var filterSap = materialsInDB.Where(n => n.SapNumber == material.SapNumber).FirstOrDefault();
+        if (filterName is null && filterSap is null)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    private void ShowDialog(string mesaage)
+    {
+        modalWarrning.Show(mesaage);
     }
 }
