@@ -130,7 +130,7 @@
     {
         wagens = await singleWagen.GetWagenAsync();
     }
-    private async void AddNewBand()
+    private async Task AddNewBand()
     {
         List<BasicWagenModel> basicWagens = new();
 
@@ -145,6 +145,7 @@
         {
             await bandData.CreateBand(band);
         }
+        newBand = new();
     }
 
 
