@@ -1,0 +1,60 @@
+﻿@if (ShowBox)
+{
+    <div class="modal fade show d-block" id="exampleModel" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@Title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="()=> OnChoiceChange(false)"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <p>@Message</p>
+                    
+                </div>
+
+                <div class="modal-footer">
+                    @* <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="()=> OnChoiceChange(false)">Cancel</button> *@
+                    <button type="button" class="btn btn-primary" @onclick="()=> OnChoiceChange(true)">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = "Warrning";
+
+    [Parameter]
+    public string Message { get; set; } = "";
+
+    
+    /// <summary>
+    /// trigger to show the dialog or hide
+    /// </summary>
+    public bool ShowBox { get; set; }
+
+    /// <summary>
+    /// If user click cancel is false ,delete is true
+    /// </summary>
+    [Parameter]
+    public EventCallback<bool> UserChoise { get; set; }
+
+
+    public void Show(string msg)
+    {
+        Message = msg;
+        ShowBox = true;
+        StateHasChanged();
+    }
+
+    protected async Task OnChoiceChange(bool value)
+    {
+        ShowBox = false;
+        await UserChoise.InvokeAsync(value);
+    }
+
+}
