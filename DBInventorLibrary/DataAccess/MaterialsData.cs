@@ -27,7 +27,7 @@ namespace DBInventorLibrary.DataAccess
                 output = result.ToList();
 
                 // how long the data will be in memory
-                _cahce.Set(CacheName, output, TimeSpan.FromMinutes(1));
+                _cahce.Set(CacheName, output, TimeSpan.FromSeconds(1));
             }
             return output;
         }
@@ -63,5 +63,11 @@ namespace DBInventorLibrary.DataAccess
             return _materials.ReplaceOneAsync(findMaterial, material, new ReplaceOptions { IsUpsert = true });
         }
         #endregion
+
+
+        public async Task DeleteMaterila(MaterialsModel material)
+        {
+            await _materials.DeleteOneAsync(d => d.Id == material.Id);
+        }
     }
 }
