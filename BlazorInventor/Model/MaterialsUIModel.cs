@@ -15,7 +15,7 @@ namespace BlazorInventor.Model
         
         
         [Required]
-        [Range(0, 1000)]
+        [Range(1, 5000)]
         public int Quantity { get; set; }
         public string Image { get; set; }
     }
