@@ -5,9 +5,10 @@
 
 <h3>Add Materials</h3>
 
-<ModalWarrning @ref="modalWarrning" />
+@* <ModalWarrning @ref="modalWarrning" /> *@
+<ToastInformation @ref=TostInfo Message=@ToastMessage Delay="3000" Header=@ToastHeader ToastBg=@ToastBG/>
 
-<EditForm Context="addMaterialsForm" OnValidSubmit="AddNewMaterial" Model="newMaterial">
+<EditForm Context="addMaterialsForm" OnValidSubmit="@AddNewMaterial" Model="@newMaterial">
     <DataAnnotationsValidator />
     <ValidationSummary />
     <div>
@@ -53,6 +54,10 @@
 @code {
     private MaterialsUIModel newMaterial = new();
 
+    public string ToastHeader { get; set; }
+    public string ToastMessage { get; set; }
+    public string ToastBG { get; set; }
+
     private string ImageName = "";
 
     private long maxFileSize = 1024 * 1024 * 3; // it is 3 mb
@@ -64,7 +69,9 @@
     /// <summary>
     /// refernce for dialog
     /// </summary>
-    private ModalWarrning modalWarrning { get; set; }
+    // private ModalWarrning modalWarrning { get; set; }
+
+    private ToastInformation TostInfo{ get; set; }
 
     private void LoadFile(InputFileChangeEventArgs e)
     {
@@ -124,15 +131,20 @@
         if (await CheckIfItemSaved(material) == true)
         {
             await materialsData.CreateMaterial(material);
+
+            await ShowToastDialog("New Material Added", $"Material {material.Name} has been Addedd Succefully","success");
+
+            // clear the form and list to refresh after submit
+            newMaterial = new();
+            file = null;
+            errors.Clear();
         }
         else
         {
-            ShowDialog($"Sap Number {material?.SapNumber} or Article Name '{material?.Name}' already in Data Base!!");
+            await ShowToastDialog("Can not add Material", $"Sap Number {material?.SapNumber} or Article Name '{material?.Name}' already in Data Base!!","danger");
         }
 
-        newMaterial = new();
-        file = null;
-        errors.Clear(); 
+
     }
 
     private async Task<bool> CheckIfItemSaved(MaterialsModel material)
@@ -150,8 +162,17 @@
         return false;
     }
 
-    private void ShowDialog(string mesaage)
+    // private void ShowDialogWarrning(string mesaage)
+    // {
+    //     modalWarrning.Show(mesaage);
+    // }
+
+    private async Task ShowToastDialog(string header, string message,string toastBG)
     {
-        modalWarrning.Show(mesaage);
+        ToastHeader = header;
+        ToastMessage = message;
+        ToastBG = toastBG;
+
+        await TostInfo.ShowToast();
     }
 }
