@@ -8,29 +8,29 @@
 @* dialog to show when we click at the list item to add to new band*@
 <ModalAddPosition @ref=modalAdd UserChoise="ConfirmAddPosition" wagenDetail="wagenDetail" />
 
-<EditForm Model="newBand" OnValidSubmit="AddNewBand">
+<EditForm Model="@newBand" OnValidSubmit="@AddNewBand">
     <DataAnnotationsValidator />
     <ValidationSummary />
     <div class="row">
-        <div class="col">
+        <div>
 
             <div class="mb-3">
                 <label for="bandNumber">Band Number</label>
                 <InputNumber class="form-control" id="bandNumber" @bind-Value="newBand.Number"></InputNumber>
             </div>
 
-            <div class="container">
+            <div>
                 <label for="wagenList" >Add Wagen</label>
-                <div id="wagenList" class="container">
+                <div id="wagenList">
                     @*list of the wagens*@
-                    <div class="row">
+                    <div >
                         @if (wagens is not null)
                         {
-                            <div class="row">
+                            <div >
                                 <ul class="list-group" >
                                     @foreach (var item in wagens)
                                     {
-                                        <li class="col list-group-item list-group-item-primary" @onclick="(()=> ShowDialogPositon(item))">@item.Name</li>
+                                        <li class="list-group-item list-group-item-primary" role="button" @onclick="(()=> ShowDialogPositon(item))">@item.Name</li>
                                     }
                                 </ul>
                             </div>
@@ -57,50 +57,6 @@
     </div>
     <button type="submit" class="btn btn-primary mt-3">Add Band</button>
 </EditForm>
-<div>
-    @* Get Bands Data *@
-    @* <EditForm Model="addNewBand" OnValidSubmit="AddExcistWagenToBand">
-    <div class="row">
-    <div class="col-sm-4">
-
-    <div class="mb-3">
-    <label for="bandNumber">Band Number</label>
-    <InputSelect class="form-control" id="bandNumber" @bind-Value="addNewBand.Number">
-    <option>Select Band</option>
-    @if (allBands is not null)
-    {
-    @foreach (var band in allBands)
-    {
-    <option value="@band.Id">@band.Number</option>
-    }
-    }
-    </InputSelect>
-
-
-    </div>
-    <div class="mb-3">
-    <label for="bandposition">Position</label>
-    <InputNumber class="form-control" id="bandposition" @bind-Value="addNewBand.Position"></InputNumber>
-    </div>
-    <div class="mb-3">
-    <label for="wagenList" >Add Wagen</label>
-    <InputSelect id="wagenList" class="form-select" @bind-Value="addNewBand.Id">
-    <option>Select Wagen </option>
-    @if (wagens is not null)
-    {
-    @foreach (var wagen in wagens)
-    {
-    <option value="@wagen.Id">@wagen.Name</option>
-    }
-    }
-    </InputSelect>
-    </div>
-    </div>
-    </div>
-    <button type="submit" class="btn btn-primary">Add Band</button>
-    </EditForm>
- *@
-</div>
 
 @code {
     /// <summary>
@@ -145,7 +101,13 @@
         {
             await bandData.CreateBand(band);
         }
+
+        // after we add the new band we clear the model and list to refresh the items
         newBand = new();
+        wagensToAdd.Clear();
+        wagens.Clear();
+        wagens = await singleWagen.GetWagenAsync();
+
     }
 
 
