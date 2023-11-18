@@ -1,0 +1,75 @@
+﻿@inject IJSRuntime jsRuntime
+
+
+@* <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11"> *@
+<div class="position-fixed @Position p-3" style="z-index: 11">
+    <div id="liveToast" @ref="toastRef" class="toast hide @BackGround(ToastBg) border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="@Delay">
+    <div class="toast-header">
+      @* <img src="..." class="rounded me-2" alt="..."> *@
+            <strong class="me-auto">@Header</strong>
+      @* <small>@DateTime.Now.ToShortDateString()</small> *@
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+      @Message
+    </div>
+  </div>
+</div>
+
+@code{
+    ElementReference toastRef;
+
+    [Parameter]
+    public string Message { get; set; } = "Message";
+
+    [Parameter]
+    public string Header { get; set; } = "Header";
+
+    /// <summary>
+    /// in second start 1000
+    /// </summary>
+    [Parameter]
+    public int Delay { get; set; } = 1000;
+
+    /// <summary>
+    /// "success" => "bg-success",
+    /// "danger" => "bg-danger",
+    ///"info" => "bg-info",
+    /// </summary>
+    [Parameter]
+    public string ToastBg { get; set; } = "success";
+
+    /// <summary>
+    /// Positions
+    /// "top-0 end-0" Top Right
+    /// "top-0 start-0" Top left
+    /// "top-0 start-50 translate-middle-x" Top center
+    /// "top-50 start-0 translate-middle-y" Middle left
+    /// "top-50 start-50 translate-middle" Middle center
+    /// "top-50 end-0 translate-middle-y" Middle right
+    /// "bottom-0 start-0" Bottom left
+    /// "bottom-0 start-50 translate-middle-x" Bottom center
+    /// "bottom-0 end-0" Bottom right
+    /// </summary>
+    [Parameter]
+    public string Position { get; set; } = "top-0 end-0";
+
+    public async Task ShowToast()
+    {
+        await jsRuntime.InvokeVoidAsync("ShowToast", toastRef);
+    }
+    
+
+    private string BackGround(string status)
+    {
+        var bg =  status switch
+        {
+            "success" => "bg-success",
+            "danger" => "bg-danger",
+            "info" => "bg-info",
+            _ => ""
+        };
+        return bg;
+    }
+}
+
