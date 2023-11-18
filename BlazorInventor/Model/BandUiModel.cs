@@ -7,6 +7,7 @@ namespace BlazorInventor.Model
     {
         public string Id { get; set; }
         [Required]
+        [Range(500, 550)]
         public int Number { get; set; }
         public int Position { get; set; }
         [Required]
