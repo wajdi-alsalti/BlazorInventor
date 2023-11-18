@@ -31,7 +31,7 @@ namespace DBInventorLibrary.DataAccess
                 output = result.ToList();
 
                 // how long the data will be in memory
-                _cahce.Set(CacheName,output,TimeSpan.FromMinutes(1));
+                _cahce.Set(CacheName,output,TimeSpan.FromSeconds(1));
             }
             return output;
         }
