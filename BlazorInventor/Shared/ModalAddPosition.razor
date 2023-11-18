@@ -5,7 +5,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">@Title</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="()=> OnChoiceChange(wagenDetail)"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="Close"></button>
                 </div>
 
                 <div class="modal-body">
@@ -15,7 +15,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="()=> OnChoiceChange(wagenDetail)">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="Close">Cancel</button>
                     <button type="button" class="btn btn-primary" @onclick="()=> OnChoiceChange(wagenDetail)">Add Position</button>
                 </div>
             </div>
@@ -55,11 +55,17 @@
         StateHasChanged();
     }
 
+    public void Close()
+    {
+        ShowBox = false;
+    }
+
     protected async Task OnChoiceChange(SingleWagenModel value)
     {
         ShowBox = false;
         value.Position = Position;
         await UserChoise.InvokeAsync(value);
+        Position = 0;
     }
 
     private void WagenPositionSelected(ChangeEventArgs e)
