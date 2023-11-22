@@ -1,5 +1,4 @@
 ﻿using DBInventorLibrary.Models.Bands;
-using DBInventorLibrary.Models.MaterialsModels;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace DBInventorLibrary.DataAccess
@@ -27,7 +26,7 @@ namespace DBInventorLibrary.DataAccess
                 output = result.ToList();
 
                 // how long the data will be in memory
-                _cahce.Set(CacheName, output, TimeSpan.FromMinutes(1));
+                _cahce.Set(CacheName, output, TimeSpan.FromSeconds(1));
             }
             return output;
         }
@@ -44,16 +43,16 @@ namespace DBInventorLibrary.DataAccess
             //return result.FirstOrDefault();
             return null;
         }
-    #endregion
+        #endregion
 
-    #region Add Band To DB
-    public Task CreateBand(BandsModel band)
+        #region Add Band To DB
+        public Task CreateBand(BandsModel band)
         {
             return _bands.InsertOneAsync(band);
         }
         #endregion
 
-        #region Update user Info
+        #region Update band Info
         public Task UpadteBand(BandsModel band)
         {
             var findBand = Builders<BandsModel>.Filter.Eq("Id", band.Id);
@@ -61,6 +60,13 @@ namespace DBInventorLibrary.DataAccess
             // if find record replace it with new data if there is no record add new one
             // replace the user found with the new user
             return _bands.ReplaceOneAsync(findBand, band, new ReplaceOptions { IsUpsert = true });
+        }
+        #endregion
+
+        #region delete band
+        public async Task DeleteBand(BandsModel band)
+        {
+            await _bands.DeleteOneAsync(d => d.Id == band.Id);
         }
         #endregion
     }
