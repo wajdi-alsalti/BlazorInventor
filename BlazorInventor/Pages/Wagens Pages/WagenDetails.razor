@@ -1,0 +1,117 @@
+﻿@page "/WagenDetail/{Id}"
+@inject ISingleWagenData wagenData
+
+<h3>@wagenDetails.Name Details</h3>
+
+
+<ToastInformation @ref=TostInfo Message=@ToastMessage Delay=3000 Header=@ToastHeader ToastBg=@ToastBG />
+
+<div class="container mb-3">
+    <EditForm Model="@wagenDetails" Context="wagenDetailsInfo" OnValidSubmit="UpdateWagenDetails">
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-xl-9">
+                    <label id="wagenName">Name</label>
+                    <input class="form-control" type="text" @bind-value=@wagenDetails.Name />
+                </div>
+                <div class="col-xl-3 pt-4">
+                    <button type="button" class="btn btn-outline-primary" @onclick="ShowMaterilas">Add Materilas</button>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div>
+                <ul class="list-group">
+                    @foreach (var materila in wagenDetails.WagenMaterials)
+                    {
+                        <div class="row">
+                            <div class="col-xl-10 mb-2">
+                                <li class="list-group-item list-group-item-primary">@materila.Name With SapNumber @materila.SapNumber</li>
+                            </div>
+                            <div class="col-xl-2">
+                                <button type="button" class="btn btn-outline-danger mb-3" @onclick="(()=> DeleteMaterila(materila))">Delete</button>
+                            </div>
+                        </div>
+                    }
+                </ul>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-outline-primary">Update</button>
+    </EditForm>
+</div>
+        
+@if (showMaterilasToAdd)
+{
+    <div class="container"> 
+        <AddMaterialsComponent AddedmaterilasList="addedmaterilasList" />
+    </div>
+}
+@code {
+    public string ToastHeader { get; set; }
+    public string ToastMessage { get; set; }
+    public string ToastBG { get; set; }
+
+    private ToastInformation TostInfo { get; set; }
+
+    private List<MaterialsModel> addedmaterilasList = new();
+
+    private bool showMaterilasToAdd = false;
+
+    [Parameter]
+    public string Id { get; set; }
+
+    private SingleWagenModel wagenDetails = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        wagenDetails = await wagenData.GetWagen(Id);
+    }
+
+    private async Task UpdateWagenDetails(EditContext context)
+    {
+        List<BasicMaterialsModel> basicMaterials = new();
+        var updatedWagen = (SingleWagenModel)context.Model;
+
+        // convert materila to basic model
+        foreach (var materila in addedmaterilasList)
+        {
+            basicMaterials.Add(new BasicMaterialsModel(materila));
+        }
+
+        // add new materila to list of the wagen materilas
+        foreach (var item in basicMaterials)
+        {
+            updatedWagen.WagenMaterials.Add(item);
+        }
+        // updatedWagen.WagenMaterials = basicMaterials;
+
+        await wagenData.UpadteWagen(updatedWagen);
+
+        await ShowToastDialog("Wagen has been Updated", $"{updatedWagen.Name} has saved in DB", "success");
+
+        showMaterilasToAdd = false;
+        addedmaterilasList.Clear();
+    }
+
+    private async Task DeleteMaterila(BasicMaterialsModel material)
+    {
+        wagenDetails.WagenMaterials.Remove(material);
+        await wagenData.UpadteWagen(wagenDetails);
+
+        await ShowToastDialog("Warrning", $"{material.Name} has been removed from Wagen", "info");
+    }
+
+    private async Task ShowToastDialog(string header, string message, string toastBG)
+    {
+        ToastHeader = header;
+        ToastMessage = message;
+        ToastBG = toastBG;
+
+        await TostInfo.ShowToast();
+    }
+
+    private void ShowMaterilas()
+    {
+        showMaterilasToAdd = true;
+    }
+}

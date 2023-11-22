@@ -1,0 +1,51 @@
+﻿@page "/updateWagen"
+@inject ISingleWagenData singleWagenData
+@inject NavigationManager navManager
+
+<h3>update Wagen</h3>
+
+<div class="container">
+    <h3>Wagens List</h3>
+    @if (wagensList is not null)
+    {
+        <ul class="list-group">
+            @foreach (var item in wagensList)
+            {
+                <div class="row">
+                    <div class="col-xl-10 mb-2">
+                        <li class="list-group-item list-group-item-primary" role="button" @onclick="(() => ItemDetails(item))">@item.Name</li>
+                    </div>
+                    <div class="col-xl-2">
+                        <button class="btn btn-outline-primary mb-3" @onclick="(() => ItemDetails(item))">Edit</button>
+                        <button class="btn btn-outline-danger mb-3" @onclick="(() => ItemDelete(item))">Delete</button>
+                    </div>
+                </div>
+            }
+        </ul>
+    }
+</div>
+@code {
+    /// <summary>
+    /// parameter capture in wagen detail page
+    /// </summary>
+    [Parameter]
+    public string Id { get; set; }
+    private List<SingleWagenModel> wagensList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        wagensList = await singleWagenData.GetWagenAsync();
+    }
+
+    private void ItemDetails(SingleWagenModel wagen)
+    {
+        Id = wagen.Id;
+        navManager.NavigateTo($"/WagenDetail/{Id}");
+
+    }
+
+    private async Task ItemDelete(SingleWagenModel wagen)
+    {
+        await singleWagenData.DeleteWagen(wagen);
+    }
+}
