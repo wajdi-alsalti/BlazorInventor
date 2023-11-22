@@ -1,0 +1,81 @@
+﻿@inject IMaterialsData materialsData
+
+<h3>AddMaterialsComponent</h3>
+
+
+<div class="container">
+    <div class="mb-3">
+        <label for="materials">Materials List</label>
+        @if (materilasList is not null)
+        {
+            <ul class="list-group">
+                @foreach (var item in materilasList)
+                {
+                    <div class="mb-1">
+                        <li class="list-group-item list-group-item-primary" role="button" @onclick="(()=> ItemAddToListClicked(item))">@item.Name</li>
+                    </div>
+                }
+            </ul>
+        }
+    </div>
+    <div class="mb-3">
+        <label for="materialsadded">add Materials to List</label>
+        @if (AddedmaterilasList is not null)
+        {
+            <ul class="list-group">
+                @foreach (var item in AddedmaterilasList)
+                {
+                    <li class="list-group-item list-group-item-success" @onclick="(()=> ItemRemoveFromListClicked(item))">@item.Name</li>
+                }
+            </ul>
+        }
+    </div>
+</div>
+@code {
+
+    
+    private List<MaterialsModel> materilasList;
+
+    [Parameter]
+    public List<MaterialsModel> AddedmaterilasList { get; set; } 
+
+    protected override async Task OnInitializedAsync()
+    {
+        materilasList = await GetMaterials();
+
+    }
+
+    private async Task<List<MaterialsModel>> GetMaterials()
+    {
+        return await materialsData.GetMaterialAsync();
+    }
+
+
+    private void ItemAddToListClicked(MaterialsModel materialsUI)
+    {
+
+        if (AddedmaterilasList is not null)
+        {
+            AddedmaterilasList.Add(materialsUI);
+
+        }
+
+        if (materilasList is not null)
+        {
+            materilasList.Remove(materialsUI);
+        }
+    }
+    private void ItemRemoveFromListClicked(MaterialsModel materialsUI)
+    {
+
+        if (materilasList is not null)
+        {
+            materilasList.Add(materialsUI);
+        }
+
+        if (AddedmaterilasList is not null)
+        {
+            AddedmaterilasList.Remove(materialsUI);
+        }
+    }
+}
