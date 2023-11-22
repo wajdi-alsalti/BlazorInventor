@@ -1,0 +1,56 @@
+﻿@page "/updateBand"
+@inject IBandsData bandsData
+@inject NavigationManager navManager
+
+<h3>update Band</h3>
+
+<div class="container">
+    <h3>Bands List</h3>
+    @if (bandsList is not null)
+    {
+        <ul class="list-group">
+            @foreach (var item in bandsList)
+            {
+                <div class="row">
+                    <div class="col-xl-10 mb-2">
+                        <li class="list-group-item list-group-item-primary" role="button" @onclick="(() => ItemDetails(item))">@item.Number</li>
+                    </div>
+                    <div class="col-xl-2">
+                        <button class="btn btn-outline-primary mb-3" @onclick="(() => ItemDetails(item))">Edit</button>
+                        <button class="btn btn-outline-danger mb-3" @onclick="(() => ItemDelete(item))">Delete</button>
+                    </div>
+                </div>
+            }
+        </ul>
+    }
+</div>
+
+
+
+@code {
+    /// <summary>
+    /// parameter capture in band detail page
+    /// </summary>
+    [Parameter]
+    public string Id { get; set; }
+
+    private List<BandsModel> bandsList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        bandsList = await bandsData.GetBandAsync();
+    }
+
+    private void ItemDetails(BandsModel band)
+    {
+        Id = band.Id;
+        navManager.NavigateTo($"/BandDetail/{Id}");
+
+    }
+
+    private async Task ItemDelete(BandsModel band)
+    {
+        await bandsData.DeleteBand(band);
+    }
+
+}

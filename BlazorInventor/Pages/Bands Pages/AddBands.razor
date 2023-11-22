@@ -1,0 +1,64 @@
+﻿@page "/AddBands"
+
+@inject IBandsData bandData
+@inject ISingleWagenData singleWagen
+
+
+<h3>New Band</h3>
+
+<EditForm Model="@newBand" OnValidSubmit="@AddNewBand">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="row">
+        <div>
+
+            <div class="mb-3">
+                <label for="bandNumber">Band Number</label>
+                <InputNumber class="form-control" id="bandNumber" @bind-Value="newBand.Number"></InputNumber>
+            </div>
+            <AddWagenComponent wagensToAdd="@wagensToAdd"/>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Add Band</button>
+</EditForm>
+
+@code {
+    /// <summary>
+    /// list we have from DB
+    /// </summary>
+    private List<SingleWagenModel> wagens;
+
+    /// <summary>
+    /// list of the wagens we added to band
+    /// </summary>
+    private List<SingleWagenModel> wagensToAdd = new();
+
+
+    private BandUiModel newBand = new();
+
+
+    private async Task AddNewBand(EditContext context)
+    {
+        var newBandAdded = (BandUiModel)context.Model;
+        List<BasicWagenModel> basicWagens = new();
+
+        BandsModel band = new();
+        band.Number = newBand.Number;
+        foreach (var item in wagensToAdd)
+        {
+            basicWagens.Add(new BasicWagenModel(item));
+        }
+        band.Wagens = basicWagens;
+        if (band.Wagens.Count > 0)
+        {
+            await bandData.CreateBand(band);
+        }
+
+        // after we add the new band we clear the model and list to refresh the items
+        newBand = new();
+        wagensToAdd.Clear();
+        
+        wagens = await singleWagen.GetWagenAsync();
+
+    }
+}

@@ -1,0 +1,83 @@
+﻿@page "/BandDetail/{Id}"
+@inject IBandsData bandData
+
+<h3> @bandDetail.Number Details</h3>
+<div class="container mb-3">
+    <EditForm Context="UpDateBand" OnValidSubmit="UpDateBand" Model=@bandDetail>
+        <div>
+            <h4>Wagen List Band Have</h4>
+            <ul class="list-group">
+                @foreach (var wagen in bandDetail.Wagens)
+                {
+                    <li class="list-group-item list-group-item-primary" role="button">
+                        @wagen.Name at Position
+                        <input class="form-control" type="number" @bind-value=@wagen.Position />
+                        <button class="btn btn-danger mt-2" @onclick="(()=>DeleteWagenFromBand(wagen))">Delete</button>
+                    </li>
+                }
+            </ul>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Update Band</button>
+    </EditForm>
+</div>
+
+@if (showWagensToAdd)
+{
+    <div class="container">
+        <AddWagenComponent wagensToAdd="@wagensToAdd"/>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    private BandsModel bandDetail = new();
+
+    private bool showWagensToAdd = false;
+
+    /// <summary>
+    /// list of the wagens we added to band
+    /// </summary>
+    private List<SingleWagenModel> wagensToAdd = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        bandDetail = await bandData.GetBand(Id);
+    }
+
+    private void UpDateBand(EditContext context)
+    {
+        List<BasicWagenModel> basicWagens = new();
+        var newWagensAdded = wagensToAdd;
+        var updatedInfo = (BandsModel)context.Model;
+
+        // convert the new added wagens to basic
+        foreach (var item in wagensToAdd)
+        {
+            basicWagens.Add(new BasicWagenModel(item));
+        }
+
+        // add all the new wagens in band
+        foreach (var item in basicWagens)
+        {
+            updatedInfo.Wagens.Add(item);
+        }
+
+        bandData.UpadteBand(updatedInfo);
+        wagensToAdd.Clear();
+        showWagensToAdd = false;
+    }
+
+    private void DeleteWagenFromBand(BasicWagenModel wagenModel)
+    {
+       bandDetail.Wagens.Remove(wagenModel);
+        bandData.UpadteBand(bandDetail);
+    }
+
+    private void ShowMaterilas()
+    {
+        showWagensToAdd = true;
+    }
+}
