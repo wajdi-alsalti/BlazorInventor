@@ -15,7 +15,7 @@ namespace DBInventorLibrary.DataAccess
             _cahce = cahce;
         }
 
-        #region get wagen info from DB
+        #region get Materila info from DB
 
         public async Task<List<MaterialsModel>> GetMaterialAsync()
         {
@@ -46,14 +46,14 @@ namespace DBInventorLibrary.DataAccess
         }
         #endregion
 
-        #region Add Wagen To DB
+        #region Add Materila To DB
         public Task CreateMaterial(MaterialsModel material)
         {
             return _materials.InsertOneAsync(material);
         }
         #endregion
 
-        #region Update Wagen Info
+        #region Update Materila Info
         public Task UpadteMaterial(MaterialsModel material)
         {
             var findMaterial = Builders<MaterialsModel>.Filter.Eq("Id", material.Id);
@@ -64,10 +64,11 @@ namespace DBInventorLibrary.DataAccess
         }
         #endregion
 
-
+        #region delete materila
         public async Task DeleteMaterila(MaterialsModel material)
         {
             await _materials.DeleteOneAsync(d => d.Id == material.Id);
         }
+        #endregion
     }
 }
