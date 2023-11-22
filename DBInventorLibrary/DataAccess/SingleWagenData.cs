@@ -2,6 +2,7 @@
 using MongoDB.Driver;
 using Microsoft.Extensions.Caching.Memory;
 using System.Collections.Generic;
+using DBInventorLibrary.Models.MaterialsModels;
 
 namespace DBInventorLibrary.DataAccess
 {
@@ -69,6 +70,13 @@ namespace DBInventorLibrary.DataAccess
             // if find record replace it with new data if there is no record add new one
             // replace the user found with the new user
             return _wagens.ReplaceOneAsync(findwagen, wagen, new ReplaceOptions { IsUpsert = true });
+        }
+        #endregion
+
+        #region delete Wagen
+        public async Task DeleteWagen(SingleWagenModel wagen)
+        {
+            await _wagens.DeleteOneAsync(d => d.Id == wagen.Id);
         }
         #endregion
     }
