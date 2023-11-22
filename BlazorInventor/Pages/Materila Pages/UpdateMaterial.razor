@@ -1,0 +1,59 @@
+﻿@page "/updateMaterila"
+@inject IMaterialsData materialsData
+
+@inject NavigationManager navManager
+
+
+<h3>Update or Delete Material</h3>
+
+
+<div class="container">
+    <h3>Materials List</h3>
+    @if (materilasList is not null)
+    {
+        <ul class="list-group">
+            @foreach (var item in materilasList)
+            {
+                <div class="row">
+                    <div class="col-xl-10 mb-2">
+                        <li class="list-group-item list-group-item-primary" role="button" @onclick="(() => ItemDetails(item))">@item.Name</li>
+                    </div>
+                    <div class="col-xl-2">
+                        <button class="btn btn-outline-primary mb-3" @onclick="(() => ItemDetails(item))">Edit</button>
+                        <button class="btn btn-outline-danger mb-3" @onclick="(() => ItemDelete(item))">Delete</button>
+                    </div>
+                </div>
+            }
+        </ul>
+    }
+</div>
+        
+
+
+@code {
+    /// <summary>
+    /// parameter capture in material detail page
+    /// </summary>
+    [Parameter]
+    public string Id { get; set; }
+
+    private List<MaterialsModel> materilasList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        materilasList = await materialsData.GetMaterialAsync();
+    }
+
+    private void ItemDetails(MaterialsModel material)
+    {
+        Id = material.Id;
+        navManager.NavigateTo($"/MaterialDetail/{Id}");
+
+    }
+
+    private async Task ItemDelete(MaterialsModel material)
+    {
+        await materialsData.DeleteMaterila(material);
+    }
+   
+}
