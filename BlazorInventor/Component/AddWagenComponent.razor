@@ -1,0 +1,113 @@
+﻿@inject ISingleWagenData singleWagen
+<h3>Add Wagens</h3>
+
+@* dialog to show when we click at the list item to add to new band*@
+<ModalAddPosition @ref=modalAdd UserChoise="ConfirmAddPosition" wagenDetail="wagenDetail" />
+<div class="container">
+    <label for="wagenList">Add Wagen</label>
+    <div class="container">
+        @*list of the wagens*@
+        <div>
+            @if (wagens is not null)
+            {
+                <div>
+                    <ul class="list-group">
+                        @foreach (var item in wagens)
+                        {
+                            <li class="list-group-item list-group-item-primary" role="button" @onclick="(()=> ShowDialogPositon(item))">@item.Name</li>
+                        }
+                    </ul>
+                </div>
+            }
+        </div>
+
+    </div>
+    <div class="container mt-3">
+        <label for="materialsadded">Wagens added to Band</label>
+        @*List of the added wagens *@
+        @if (wagensToAdd is not null)
+        {
+            <ul class="list-group">
+                @foreach (var item in wagensToAdd)
+                {
+                    <div class="row ">
+                        <div class="col-xl-9">
+                            <li class="list-group-item list-group-item-success" @onclick="(()=> ItemRemoveFromListClicked(item))">@item.Name </li>
+                        </div>
+                        <div class="col-xl-3">
+                            <span class="badge bg-primary rounded-pill text-capitalize">At position @item.Position</span>
+                        </div>
+                    </div>
+                }
+            </ul>
+        }
+    </div>
+</div>
+@code {
+    /// <summary>
+    /// to take the info to dialog details
+    /// </summary>
+    public SingleWagenModel wagenDetail { get; set; }
+
+    /// <summary>
+    /// reference to modal dialog to add position to wagen
+    /// </summary>
+    protected ModalAddPosition modalAdd { get; set; }
+
+    /// <summary>
+    /// list we have from DB
+    /// </summary>
+    private List<SingleWagenModel> wagens;
+
+    /// <summary>
+    /// list of the wagens we added to band
+    /// </summary>
+    [Parameter]
+    public List<SingleWagenModel> wagensToAdd { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        wagens = await singleWagen.GetWagenAsync();
+    }
+
+    protected void ConfirmAddPosition(SingleWagenModel add)
+    {
+        ItemAddToListClicked(add);
+    }
+
+    private void ShowDialogPositon(SingleWagenModel singleWagen)
+    {
+        wagenDetail = singleWagen;
+        modalAdd.Show($"You need to add position to ' {singleWagen.Name} ' ");
+    }
+
+    private void ItemRemoveFromListClicked(SingleWagenModel singleWagen)
+    {
+        if (wagens is not null)
+        {
+            wagens.Add(singleWagen);
+        }
+
+        if (wagensToAdd is not null)
+        {
+            wagensToAdd.Remove(singleWagen);
+        }
+    }
+
+    private void ItemAddToListClicked(SingleWagenModel singleWagen)
+    {
+        // add the value from input to selected wagen
+        if (singleWagen.Position != 0)
+        {
+            if (wagensToAdd is not null)
+            {
+                wagensToAdd.Add(singleWagen);
+            }
+
+            if (wagens is not null)
+            {
+                wagens.Remove(singleWagen);
+            }
+        }
+    }
+}
