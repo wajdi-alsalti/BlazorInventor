@@ -47,5 +47,7 @@
     private async Task ItemDelete(SingleWagenModel wagen)
     {
         await singleWagenData.DeleteWagen(wagen);
+
+        wagensList = await singleWagenData.GetWagenAsync();
     }
 }
