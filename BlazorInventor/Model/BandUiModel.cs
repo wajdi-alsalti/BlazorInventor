@@ -8,7 +8,7 @@ namespace BlazorInventor.Model
         public string Id { get; set; }
         [Required]
         [Range(500, 550)]
-        public int Number { get; set; }
+        public int Number { get; set; } = 500;
         public int Position { get; set; }
         [Required]
         public List<BasicWagenModel> Wagens { get; set; } = new List<BasicWagenModel>();

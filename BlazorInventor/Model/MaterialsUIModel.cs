@@ -8,10 +8,10 @@ namespace BlazorInventor.Model
         
         [Required]
         public string Name { get; set; }
-        
+
         [Required]
         [Range(1000, int.MaxValue)]
-        public int SapNumber { get; set; }
+        public int SapNumber { get; set; } = 1000;
         
         
         [Required]
