@@ -51,6 +51,8 @@
     private async Task ItemDelete(BandsModel band)
     {
         await bandsData.DeleteBand(band);
+
+        bandsList = await bandsData.GetBandAsync();
     }
 
 }
