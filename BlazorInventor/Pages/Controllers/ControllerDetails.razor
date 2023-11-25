@@ -1,0 +1,41 @@
+﻿@page "/ControllerDetails/{Id}"
+@inject IControllerData controllerData
+@inject NavigationManager navManager
+
+<h3> @Controller.Name Details</h3>
+
+<div class="container mb-3">
+    <EditForm OnValidSubmit="UpDateController" Model=@Controller>
+        <div class="mb-3">
+            <input class="form-control" type="text" placeholder="Name" @bind-value="Controller.Name" />
+        </div>
+        <div class="mb-3">
+            <input class="form-control" type="number" placeholder="Employee Number" @bind-value="Controller.Number" />
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+    </EditForm>
+</div>
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    private ControllerModel Controller = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Controller = await controllerData.GetController(Id);
+    }
+
+    private async void UpDateController(EditContext context)
+    {
+        var updatedController = (ControllerModel)context.Model;
+
+        Controller.Name = updatedController.Name;
+        Controller.Number = updatedController.Number;
+
+        await controllerData.UpadteController(Controller);
+        navManager.NavigateTo("/UpdateController");
+    }
+}

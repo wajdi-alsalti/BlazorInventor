@@ -1,0 +1,36 @@
+﻿@page "/AddController"
+@inject IControllerData controllerData
+@inject NavigationManager navManager
+
+<div class="container">
+    <EditForm OnValidSubmit="AddControllerSubmit" Model="controllerUi">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="mb-3">
+            <input class="form-control" type="text" placeholder="Name" @bind-value="controllerUi.Name" />
+        </div>
+        <div class="mb-3">
+            <input class="form-control" type="number" placeholder="Employee Number" @bind-value="controllerUi.Number" />
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary">Add</button>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    private ControllerUiModel controllerUi = new();
+    private async Task AddControllerSubmit(EditContext context)
+    {
+        ControllerModel controller = new();
+        var addedController = (ControllerUiModel)context.Model;
+
+        // mapping models
+        controller.Name = addedController.Name;
+        controller.Number = addedController.Number;
+
+        await controllerData.CreateController(controller);
+        navManager.NavigateTo("/UpdateController");
+
+    }
+}

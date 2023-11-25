@@ -1,0 +1,52 @@
+﻿@page "/UpdateController"
+@inject IControllerData controllerData
+@inject NavigationManager navManager
+
+
+<h3>Update Controller</h3>
+
+<div class="container">
+    @if (ControllersList is not null)
+    {
+        <ul class="list-group">
+            @foreach (var item in ControllersList)
+            {
+                <div class="row">
+                    <div class="col-xl-10 mb-2">
+                        <li class="list-group-item list-group-item-primary" role="button" @onclick="(() => ItemDetails(item))">@item.Name '@item.Number' </li>
+                    </div>
+                    <div class="col-xl-2">
+                        <button class="btn btn-outline-primary mb-3" @onclick="(() => ItemDetails(item))">Edit</button>
+                        <button class="btn btn-outline-danger mb-3" @onclick="(() => ItemDelete(item))">Delete</button>
+                    </div>
+                </div>
+            }
+        </ul>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    private List<ControllerModel> ControllersList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ControllersList = await controllerData.GetControllerAsync();
+    }
+
+    private void ItemDetails(ControllerModel controller)
+    {
+        Id = controller.Id;
+        navManager.NavigateTo($"/ControllerDetails/{Id}");
+
+    }
+
+    private async Task ItemDelete(ControllerModel controller)
+    {
+        await controllerData.DeleteController(controller);
+
+        ControllersList = await controllerData.GetControllerAsync();
+    }
+}
