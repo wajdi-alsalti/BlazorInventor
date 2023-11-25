@@ -54,6 +54,8 @@
     private async Task ItemDelete(MaterialsModel material)
     {
         await materialsData.DeleteMaterila(material);
+
+        materilasList = await materialsData.GetMaterialAsync();
     }
    
 }
