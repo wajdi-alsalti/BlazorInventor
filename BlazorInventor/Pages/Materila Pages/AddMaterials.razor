@@ -6,7 +6,7 @@
 <h3>Add Materials</h3>
 
 @* <ModalWarrning @ref="modalWarrning" /> *@
-<ToastInformation @ref=TostInfo Message=@ToastMessage Delay="3000" Header=@ToastHeader ToastBg=@ToastBG/>
+<ToastInformation @ref=TostInfo Message=@Toast.ToastMessage Delay=@Toast.Delay Header=@Toast.ToastHeader ToastBg=@Toast.ToastBG/>
 
 <EditForm Context="addMaterialsForm" OnValidSubmit="@AddNewMaterial" Model="@newMaterial">
     <DataAnnotationsValidator />
@@ -54,10 +54,6 @@
 @code {
     private MaterialsUIModel newMaterial = new();
 
-    public string ToastHeader { get; set; }
-    public string ToastMessage { get; set; }
-    public string ToastBG { get; set; }
-
     private string ImageName = "";
 
     private long maxFileSize = 1024 * 1024 * 3; // it is 3 mb
@@ -72,6 +68,7 @@
     // private ModalWarrning modalWarrning { get; set; }
 
     private ToastInformation TostInfo{ get; set; }
+    private ToastModel Toast = new();
 
     private void LoadFile(InputFileChangeEventArgs e)
     {
@@ -169,9 +166,10 @@
 
     private async Task ShowToastDialog(string header, string message,string toastBG)
     {
-        ToastHeader = header;
-        ToastMessage = message;
-        ToastBG = toastBG;
+        Toast.ToastHeader = header;
+        Toast.ToastMessage = message;
+        Toast.ToastBG = toastBG;
+        Toast.Delay = 3000;
 
         await TostInfo.ShowToast();
     }
