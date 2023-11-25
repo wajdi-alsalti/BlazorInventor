@@ -5,6 +5,7 @@ namespace DBInventorLibrary.DataAccess
     public interface IControllerData
     {
         Task CreateController(ControllerModel controller);
+        Task DeleteController(ControllerModel controller);
         Task<ControllerModel> GetController(string id);
         Task<List<ControllerModel>> GetControllerAsync();
         Task<ControllerModel> GetControllerFromAuthentication(string objectId);

@@ -1,5 +1,4 @@
 ﻿using DBInventorLibrary.Models.ControllerModels;
-using DBInventorLibrary.Models.MaterialsModels;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace DBInventorLibrary.DataAccess
@@ -26,7 +25,7 @@ namespace DBInventorLibrary.DataAccess
                 var result = await _controller.FindAsync(_ => true);
                 output = result.ToList();
                 // how long the data will be in memory
-                _cahce.Set(CacheName, output, TimeSpan.FromMinutes(1));
+                _cahce.Set(CacheName, output, TimeSpan.FromSeconds(1));
             }
             return output;
         }
@@ -59,6 +58,13 @@ namespace DBInventorLibrary.DataAccess
             // if find record replace it with new data if there is no record add new one
             // replace the user found with the new user
             return _controller.ReplaceOneAsync(findController, controller, new ReplaceOptions { IsUpsert = true });
+        }
+        #endregion
+
+        #region delete Controller
+        public async Task DeleteController(ControllerModel controller)
+        {
+            await _controller.DeleteOneAsync(d => d.Id == controller.Id);
         }
         #endregion
     }
