@@ -4,7 +4,7 @@
 @inject ISingleWagenData singleWagen
 
 <h3>AddWagen</h3>
-
+<ToastInformation @ref=TostInfo Message=@Toast.ToastMessage Delay=@Toast.Delay Header=@Toast.ToastHeader ToastBg=@Toast.ToastBG />
 <EditForm Model="@newWagenModel" OnValidSubmit="@AddWagenDB">
     <DataAnnotationsValidator />
     <ValidationSummary />
@@ -26,6 +26,9 @@
 
     private WagensUiModel newWagenModel = new();
 
+
+    private ToastInformation TostInfo { get; set; }
+    private ToastModel Toast = new();
     
 
     private async Task<List<MaterialsModel>> GetMaterials()
@@ -53,5 +56,14 @@
         // clear the form and list to refresh after submit
         newWagenModel = new();
         addedmaterilasList.Clear();
+    }
+    private async Task ShowToastDialog(string header, string message, string toastBG)
+    {
+        Toast.ToastHeader = header;
+        Toast.ToastMessage = message;
+        Toast.ToastBG = toastBG;
+        Toast.Delay = 3000;
+
+        await TostInfo.ShowToast();
     }
 }
