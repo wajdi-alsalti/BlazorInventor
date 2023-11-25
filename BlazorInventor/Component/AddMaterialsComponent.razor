@@ -1,40 +1,47 @@
 ﻿@inject IMaterialsData materialsData
 
-<h3>AddMaterialsComponent</h3>
 
 
 <div class="container">
     <div class="mb-3">
+        <div class="autocomplete w-25">
+            <input placeholder="Search for Materials" @bind=selectedmaterialsName @oninput=HandleInput class="form-control filter" />
+        </div>
         <label for="materials">Materials List</label>
         @if (materilasList is not null)
         {
-            <ul class="list-group">
-                @foreach (var item in materilasList)
-                {
-                    <div class="mb-1">
-                        <li class="list-group-item list-group-item-primary" role="button" @onclick="(()=> ItemAddToListClicked(item))">@item.Name</li>
-                    </div>
-                }
-            </ul>
+            <div class="overflow-auto p-3 containerComponentHeight">
+                <ul class="list-group">
+                    @foreach (var item in materilasList)
+                    {
+                        <div class="mb-1">
+                            <li class="list-group-item list-group-item-primary" role="button" @onclick="(()=> ItemAddToListClicked(item))">@item.Name</li>
+                        </div>
+                    }
+                </ul>
+            </div>
         }
     </div>
     <div class="mb-3">
         <label for="materialsadded">add Materials to List</label>
         @if (AddedmaterilasList is not null)
         {
-            <ul class="list-group">
-                @foreach (var item in AddedmaterilasList)
-                {
-                    <li class="list-group-item list-group-item-success" @onclick="(()=> ItemRemoveFromListClicked(item))">@item.Name</li>
-                }
-            </ul>
+            <div class="overflow-auto p-3 containerComponentHeight">
+                <ul class="list-group">
+                    @foreach (var item in AddedmaterilasList)
+                    {
+                        <li class="list-group-item list-group-item-success" @onclick="(()=> ItemRemoveFromListClicked(item))">@item.Name</li>
+                    }
+                </ul>
+            </div>
         }
     </div>
 </div>
 @code {
 
-    
     private List<MaterialsModel> materilasList;
+    private string filter;
+    private string selectedmaterialsName;
 
     [Parameter]
     public List<MaterialsModel> AddedmaterilasList { get; set; } 
@@ -64,6 +71,9 @@
         {
             materilasList.Remove(materialsUI);
         }
+        // TODO fix make the filter from search bar to empty
+        selectedmaterialsName = string.Empty;
+        
     }
     private void ItemRemoveFromListClicked(MaterialsModel materialsUI)
     {
@@ -78,4 +88,31 @@
             AddedmaterilasList.Remove(materialsUI);
         }
     }
+
+
+    // auto complete functions
+    private async Task HandleInput(ChangeEventArgs e)
+    {
+        var filterMaterila = await GetMaterials();
+        filter = e.Value?.ToString();
+        if (filter?.Length >= 2)
+        {
+            //filterMaterila = await GetMaterials();
+            materilasList = filterMaterila.Where(material => material.Name.Contains(filter, StringComparison.InvariantCultureIgnoreCase)).ToList();
+        }
+        else if (filter?.Length == 0)
+        {
+            materilasList = filterMaterila;
+        }
+        else if (string.IsNullOrEmpty(selectedmaterialsName))
+        {
+            materilasList = filterMaterila;
+        }
+    }
+
+    // void SelectMaterial(MaterialsModel materialsUI)
+    // {
+    //     selectedmaterialsName = materilasList!.First(c => c.Id.Equals(materialsUI.Id)).Name;
+    //     materilasList = null;
+    // }
 }

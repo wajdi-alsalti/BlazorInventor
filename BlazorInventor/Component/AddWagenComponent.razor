@@ -4,13 +4,16 @@
 @* dialog to show when we click at the list item to add to new band*@
 <ModalAddPosition @ref=modalAdd UserChoise="ConfirmAddPosition" wagenDetail="wagenDetail" />
 <div class="container">
+    <div class="autocomplete w-25">
+        <input placeholder="Search for Wagens" @bind=selectedmaterialsName @oninput=HandleInput class="form-control filter" />
+    </div>
     <label for="wagenList">Add Wagen</label>
     <div class="container">
         @*list of the wagens*@
         <div>
             @if (wagens is not null)
             {
-                <div>
+                <div class="overflow-auto p-3 containerComponentHeight">
                     <ul class="list-group">
                         @foreach (var item in wagens)
                         {
@@ -27,23 +30,29 @@
         @*List of the added wagens *@
         @if (wagensToAdd is not null)
         {
-            <ul class="list-group">
-                @foreach (var item in wagensToAdd)
-                {
-                    <div class="row ">
-                        <div class="col-xl-9">
-                            <li class="list-group-item list-group-item-success" @onclick="(()=> ItemRemoveFromListClicked(item))">@item.Name </li>
+            <div class="overflow-auto p-3 containerComponentHeight">
+                <ul class="list-group">
+                    @foreach (var item in wagensToAdd)
+                    {
+                        <div class="row ">
+                            <div class="col-xl-9">
+                                <li class="list-group-item list-group-item-success" @onclick="(()=> ItemRemoveFromListClicked(item))">@item.Name </li>
+                            </div>
+                            <div class="col-xl-3">
+                                <span class="badge bg-primary rounded-pill text-capitalize">At position @item.Position</span>
+                            </div>
                         </div>
-                        <div class="col-xl-3">
-                            <span class="badge bg-primary rounded-pill text-capitalize">At position @item.Position</span>
-                        </div>
-                    </div>
-                }
-            </ul>
+                    }
+                </ul>
+            </div>
         }
     </div>
 </div>
 @code {
+
+    private string filter;
+    private string selectedmaterialsName;
+
     /// <summary>
     /// to take the info to dialog details
     /// </summary>
@@ -108,6 +117,26 @@
             {
                 wagens.Remove(singleWagen);
             }
+        }
+    }
+
+    // auto complete functions
+    private async Task HandleInput(ChangeEventArgs e)
+    {
+        var filterWagens = await singleWagen.GetWagenAsync();
+        filter = e.Value?.ToString();
+        if (filter?.Length >= 2)
+        {
+            // filterWagens = await GetMaterials();
+            wagens = filterWagens.Where(material => material.Name.Contains(filter, StringComparison.InvariantCultureIgnoreCase)).ToList();
+        }
+        else if (filter?.Length == 0)
+        {
+            wagens = filterWagens;
+        }
+        else if (string.IsNullOrEmpty(selectedmaterialsName))
+        {
+            wagens = filterWagens;
         }
     }
 }
