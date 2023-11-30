@@ -19,6 +19,7 @@ namespace DBInventorLibrary.DataAccess
         public string WagensCollectionName { get; set; } = "Wagens";
         public string SingleWagenCollectionName { get; set; } = "SingleWagen";
         public string ControllerCollectionName { get; set; } = "Controller";
+        public string InventorControllerCollectionName { get; set; } = "InventorController";
         public MongoClient Client { get; private set; }
 
         public IMongoCollection<BandsModel> BandsCollection { get; private set; }
@@ -26,6 +27,7 @@ namespace DBInventorLibrary.DataAccess
         public IMongoCollection<WagensModel> WagensCollection { get; private set; }
         public IMongoCollection<SingleWagenModel> SingleWagenCollection { get; private set; }
         public IMongoCollection<ControllerModel> ControllerCollection { get; private set; }
+        public IMongoCollection<InventorControllers> InventorControllerCollection { get; private set; }
 
         public DbConnection(IConfiguration config)
         {
@@ -38,6 +40,7 @@ namespace DBInventorLibrary.DataAccess
             WagensCollection = _db.GetCollection<WagensModel>(WagensCollectionName);
             SingleWagenCollection = _db.GetCollection<SingleWagenModel>(SingleWagenCollectionName);
             ControllerCollection = _db.GetCollection<ControllerModel>(ControllerCollectionName);
+            InventorControllerCollection = _db.GetCollection<InventorControllers>(InventorControllerCollectionName);
 
         }
     }
