@@ -1,8 +1,11 @@
 ﻿@page "/BandDetail/{Id}"
 @inject IBandsData bandData
 
-<h3> @bandDetail.Number Details</h3>
+<h3>@bandDetail.Number Details</h3>
 <div class="container mb-3">
+    <div class="float-end mt-4 ms-1">
+        <button type="button" class="btn btn-success" @onclick="ShowWagens">Add Wagens</button>
+    </div>
     <EditForm Context="UpDateBand" OnValidSubmit="UpDateBand" Model=@bandDetail>
         <div>
             <h4>Wagen List Band Have</h4>
@@ -17,7 +20,9 @@
                 }
             </ul>
         </div>
-        <button type="submit" class="btn btn-primary mt-2">Update Band</button>
+        <div class="container d-flex align-items-center justify-content-center">
+            <button type="submit" class="btn btn-primary mt-3">Update Band</button>
+        </div>
     </EditForm>
 </div>
 
@@ -76,7 +81,7 @@
         bandData.UpadteBand(bandDetail);
     }
 
-    private void ShowMaterilas()
+    private void ShowWagens()
     {
         showWagensToAdd = true;
     }
