@@ -18,6 +18,7 @@ namespace BlazorInventor
             builder.Services.AddSingleton<IMaterialsData, MaterialsData>();
             builder.Services.AddSingleton<IWagensData, WagensData>();
             builder.Services.AddSingleton<ISingleWagenData, SingleWagenData>();
+            builder.Services.AddSingleton<IInventorControllerData, InventorControllerData>();
 
 
             // for localization
