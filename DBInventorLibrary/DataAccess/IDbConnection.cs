@@ -18,5 +18,6 @@ namespace DBInventorLibrary.DataAccess
         IMongoCollection<WagensModel> WagensCollection { get; }
         IMongoCollection<SingleWagenModel> SingleWagenCollection { get; }
         string WagensCollectionName { get; set; }
+        IMongoCollection<InventorControllers> InventorControllerCollection { get; }
     }
 }
