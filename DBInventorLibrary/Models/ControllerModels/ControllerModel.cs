@@ -9,5 +9,6 @@
         public string ObjectIdentifer { get; set; }
         public string Name { get; set; }
         public int Number { get; set; }
+        public bool HasBeenAdded { get; set; } = false;
     }
 }
