@@ -4,7 +4,9 @@
 @inject ISingleWagenData singleWagen
 
 <h3>AddWagen</h3>
+
 <ToastInformation @ref=TostInfo Message=@Toast.ToastMessage Delay=@Toast.Delay Header=@Toast.ToastHeader ToastBg=@Toast.ToastBG />
+
 <EditForm Model="@newWagenModel" OnValidSubmit="@AddWagenDB">
     <DataAnnotationsValidator />
     <ValidationSummary />
@@ -16,11 +18,12 @@
                 </div>
                 <AddMaterialsComponent AddedmaterilasList="@addedmaterilasList"/>
                 <div class="center-children">
-                <button type="submit" class="btn btn-primary"> Add Wagen</button>
+                    <button type="submit" class="btn btn-primary"> Add Wagen</button>
                 </div>
             </div>
         </div>
 </EditForm>
+
 @code {
     private List<MaterialsModel> addedmaterilasList = new();
 
