@@ -1,0 +1,72 @@
+﻿@page "/Inventor"
+@inject IControllerData controllerData
+@inject IBandsData bandData
+@inject IInventorControllerData inventorControllers
+@inject NavigationManager navManger
+
+<h3>Inventor Start Page</h3>
+
+<div class="container">
+    @if (band is not null)
+    {
+        <h3> at band @band.Number</h3>
+    }
+
+    @if (controllers is not null)
+    {
+        <h3>Controllers are :</h3>
+        @foreach (var controller in controllers.Controllers)
+        {
+            <h3>  @controller.Name  @controller.Number</h3>
+        }
+    }
+
+    <div class="container mb-2">
+            <select class="form-select" @bind="@PositionSelected">
+                <option value="">Select Position</option>
+                @for (int i = 1; i < 8; i++)
+                {
+                    <option value=@i>@i</option>
+                }
+            </select>
+    </div>
+    <div class="container d-flex align-items-center justify-content-center">
+        <button class="btn btn-primary" @onclick="NavigateToNextPage">Start</button>
+    </div>
+</div>
+@code {
+
+    InventorControllers controllers;
+
+    BandsModel band = new();
+
+    string PositionSelected = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var all = await inventorControllers.GetControllerAsync();
+        // TODO find way to replace the id of the InventorControllers id to show need to login system
+        controllers = await inventorControllers.GetController("656478c65cf57c8101a9f0c9");
+
+        band = await bandData.GetBand(controllers.Bands);
+    }
+
+    protected void NavigateToNextPage()
+    {
+        int intPoition = 0;
+        if (!string.IsNullOrEmpty(PositionSelected))
+        {
+            intPoition = int.Parse(PositionSelected);
+        }
+        var wagensWithPosition = band.Wagens.Where(x => x.Position == intPoition).ToList();
+        if (wagensWithPosition.Count == 1)
+        {
+            // navigate directly to inventor surevy with list of wagens
+            navManger.NavigateTo($"/InventorSurvey/{wagensWithPosition.FirstOrDefault().Id}");
+
+        }else
+        {
+            //TODO navigate to page have a list of the wagens at same position
+        }
+    }
+}

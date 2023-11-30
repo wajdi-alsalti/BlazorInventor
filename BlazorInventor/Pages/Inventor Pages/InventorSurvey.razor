@@ -1,0 +1,66 @@
+﻿@page "/InventorSurvey/{Id}"
+@inject IBandsData bandData
+@inject ISingleWagenData wagenData
+@inject IMaterialsData materialData
+
+<h3>Inventor Survey</h3>
+
+
+@if (firstItem is not null)
+{
+    <div class="container">
+        <p> Article Name : @firstItem.Name</p>
+        <p> SapNumber : @firstItem.SapNumber</p>
+        <p> Quantity @firstItem.Quantity</p>
+        <input type="number" @bind="inventorItemSumme" placeholder="Summe"/>
+        <button class="btn btn-primary" @onclick="LoadNextMaterisl">Next</button>
+    </div>
+}
+
+
+@code {
+    // id of the wagen
+    [Parameter]
+    public string Id { get; set; }
+
+    private SingleWagenModel wagen;
+
+    private List<MaterialsModel> materialsList = new();
+
+    private MaterialsModel firstItem;
+
+    private int? inventorItemSumme;
+
+    private int currentMaterialIndex = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        wagen = await wagenData.GetWagen(Id);
+
+        // materialsList = wagen.WagenMaterials;
+        materialsList = await ConvertFromBasicModelToMaterial(wagen.WagenMaterials);
+
+        firstItem = materialsList[currentMaterialIndex];
+    }
+
+    private async Task<List<MaterialsModel>> ConvertFromBasicModelToMaterial(List<BasicMaterialsModel> basicMaterials)
+    {
+        List<MaterialsModel> materialsList = new();
+        foreach (var item in basicMaterials)
+        {
+            var material = await materialData.GetMaterial(item.Id);
+            materialsList.Add(material);
+        }
+        return materialsList;
+    }
+
+    private void LoadNextMaterisl()
+    {
+        currentMaterialIndex++;
+        if (currentMaterialIndex < materialsList.Count)
+        {
+            firstItem = materialsList[currentMaterialIndex];
+
+        }
+    }
+}

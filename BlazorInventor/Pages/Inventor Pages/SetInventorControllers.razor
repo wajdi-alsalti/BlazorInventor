@@ -1,0 +1,164 @@
+﻿@page "/InventorControllers"
+@inject IControllerData controllerData
+@inject IInventorControllerData inventorControllerData
+@inject IBandsData bandsData
+
+<h3>Set Inventor Controllers</h3>
+<EditForm Model="@inventorControllers" OnValidSubmit="AddControllersToInventor">
+    @* bands option *@
+    <div class="container mb-2">
+        @if (BandsList is not null)
+        {
+            <select @bind="@inventorControllers.Bands" class="form-select">
+                <option value="">Select Band</option>
+                @foreach (var band in BandsList)
+                {
+                    <option value="@band.Id">@band.Number</option>
+                }
+            </select>
+    }
+    </div>
+
+    @*list of Controllers*@
+    <div class="container">
+        <div class="container">
+            <div>
+                <label>list of Controllers</label>
+            </div>
+            <div>
+                @if (ControllersList is not null)
+                @* @if (inventorControllers.Controllers is not null) *@
+                {
+                    <div class="overflow-auto p-3 containerComponentHeight">
+                        <ul class="list-group">
+                            @foreach (var item in ControllersList)
+                            @* @foreach (var item in inventorControllers.Controllers) *@
+                            {
+                                <li class="list-group-item list-group-item-primary" role="button" @onclick="(()=> ItemAddToListClicked(item))">@item.Name '@item.Number'</li>
+                            }
+                        </ul>
+                    </div>
+                }
+            </div>
+
+        </div>
+
+        @*List of the added Controllers *@
+        <div class="container mt-3">
+            <label>Controllers added to inventor for Band</label>
+            @if (ControllersListToInventor is not null)
+            {
+                <div class="overflow-auto p-3 containerComponentHeight">
+                    <ul class="list-group">
+                        @foreach (var item in ControllersListToInventor)
+                        {
+                            <li class="list-group-item list-group-item-success" role="button" @onclick="(()=> ItemRemoveFromListClicked(item))">@item.Name '@item.Number'</li>
+                        }
+                    </ul>
+                </div>
+            }
+        </div>
+    </div>
+
+    @* add button *@
+    <div class="container d-flex align-items-center justify-content-center">
+        <button type="submit" class="btn btn-primary">Add Controllers</button>
+    </div>
+
+</EditForm>
+<button type="button" class="btn btn-primary" @onclick="ResetHasBeenAdded">Reset</button>
+
+
+
+@code {
+    InventorControllers inventorControllers = new();
+
+    List<ControllerModel> ControllersList;
+    List<ControllerModel> ControllersListToInventor = new();
+    List<BandsModel> BandsList;
+    protected override async Task OnInitializedAsync()
+    {
+        // on initilize look after the controllers have a value false of HasBeenAdded
+        // for do not duplicate a controller in another band
+        var controllers = await controllerData.GetControllerAsync();
+        ControllersList = controllers.Where(x => x.HasBeenAdded == false).ToList();
+
+        BandsList = await bandsData.GetBandAsync();
+    }
+
+    private async Task AddControllersToInventor(EditContext context)
+    {
+        inventorControllers.Controllers = ControllersListToInventor;
+        if (inventorControllers.Controllers.Count == 2)
+        {
+            var result = (InventorControllers)context.Model;
+            if (!string.IsNullOrEmpty(result.Bands))
+            {
+                await inventorControllerData.CreateController(result);
+                await RefreshList();
+            }
+
+            //TODO after we create the team and the band need to controll 
+        }
+    }
+
+    // for reset HasBeenAdded to false just for test
+    private async Task ResetHasBeenAdded()
+    {
+        var controllers = await controllerData.GetControllerAsync();
+        foreach (var controller in controllers)
+        {
+            controller.HasBeenAdded = false;
+            await controllerData.UpadteController(controller);
+        }
+    }
+
+    private async Task RefreshList()
+    {
+        var controllersInInventor = inventorControllers.Controllers;
+
+        // update the controller to add the true value to HassBeenAdded to true
+        foreach (var controller in controllersInInventor)
+        {
+            await controllerData.UpadteController(controller);
+        }
+        var controllers = await controllerData.GetControllerAsync();
+        ControllersList = controllers.Where(x => x.HasBeenAdded == false).ToList();
+        ControllersListToInventor.Clear();
+    }
+
+    private void ItemRemoveFromListClicked(ControllerModel controller)
+    {
+        if (ControllersList is not null)
+        {
+            controller.HasBeenAdded = false;
+            ControllersList.Add(controller);
+        }
+
+        if (ControllersListToInventor is not null)
+        {
+            ControllersListToInventor.Remove(controller);
+        }
+    }
+
+    private void ItemAddToListClicked(ControllerModel controller)
+    {
+        
+        if (ControllersListToInventor is not null)
+        {
+            // number of controllers just 2
+            if (ControllersListToInventor.Count < 2  )
+            {
+                controller.HasBeenAdded = true;
+                ControllersListToInventor.Add(controller);
+                
+                if (ControllersList is not null)
+                {
+                    ControllersList.Remove(controller);
+                }
+            }
+        }
+
+        
+    }
+}
