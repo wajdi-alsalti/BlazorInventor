@@ -1,7 +1,7 @@
 ﻿using DBInventorLibrary.Models.Bands;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace DBInventorLibrary.DataAccess
+namespace DBInventorLibrary.DataAccess.Bands
 {
     public class BandsData : IBandsData
     {

@@ -1,6 +1,6 @@
 ﻿using DBInventorLibrary.Models.Bands;
 
-namespace DBInventorLibrary.DataAccess
+namespace DBInventorLibrary.DataAccess.Bands
 {
     public interface IBandsData
     {
