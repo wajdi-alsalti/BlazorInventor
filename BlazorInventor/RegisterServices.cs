@@ -1,4 +1,10 @@
 ﻿using DBInventorLibrary.DataAccess;
+using DBInventorLibrary.DataAccess.Bands;
+using DBInventorLibrary.DataAccess.Controllers;
+using DBInventorLibrary.DataAccess.InventorData;
+using DBInventorLibrary.DataAccess.InventorData.InventorMaterials;
+using DBInventorLibrary.DataAccess.Materials;
+using DBInventorLibrary.DataAccess.Wagens;
 
 namespace BlazorInventor
 {
@@ -16,9 +22,9 @@ namespace BlazorInventor
             builder.Services.AddSingleton<IBandsData, BandsData>();
             builder.Services.AddSingleton<IControllerData, ControllerData>();
             builder.Services.AddSingleton<IMaterialsData, MaterialsData>();
-            builder.Services.AddSingleton<IWagensData, WagensData>();
             builder.Services.AddSingleton<ISingleWagenData, SingleWagenData>();
             builder.Services.AddSingleton<IInventorControllerData, InventorControllerData>();
+            builder.Services.AddSingleton<IInventorInformation, InventorInformation>();
 
 
             // for localization
