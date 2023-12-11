@@ -1,5 +1,6 @@
 ﻿using DBInventorLibrary.Models.Bands;
 using DBInventorLibrary.Models.ControllerModels;
+using DBInventorLibrary.Models.Inventor;
 using DBInventorLibrary.Models.MaterialsModels;
 using DBInventorLibrary.Models.WagensModel;
 
@@ -19,5 +20,6 @@ namespace DBInventorLibrary.DataAccess
         IMongoCollection<SingleWagenModel> SingleWagenCollection { get; }
         string WagensCollectionName { get; set; }
         IMongoCollection<InventorControllers> InventorControllerCollection { get; }
+        IMongoCollection<InventorModel> InventorMaterialsCollection { get; }
     }
 }
