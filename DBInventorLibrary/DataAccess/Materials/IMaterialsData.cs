@@ -1,6 +1,6 @@
 ﻿using DBInventorLibrary.Models.MaterialsModels;
 
-namespace DBInventorLibrary.DataAccess
+namespace DBInventorLibrary.DataAccess.Materials
 {
     public interface IMaterialsData
     {

@@ -2,7 +2,7 @@
 using DBInventorLibrary.Models.WagensModel;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace DBInventorLibrary.DataAccess
+namespace DBInventorLibrary.DataAccess.Materials
 {
     public class MaterialsData : IMaterialsData
     {
