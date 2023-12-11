@@ -1,6 +1,6 @@
 ﻿using DBInventorLibrary.Models.WagensModel;
 
-namespace DBInventorLibrary.DataAccess
+namespace DBInventorLibrary.DataAccess.Wagens
 {
     public interface ISingleWagenData
     {

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Caching.Memory;
 using System.Collections.Generic;
 using DBInventorLibrary.Models.MaterialsModels;
 
-namespace DBInventorLibrary.DataAccess
+namespace DBInventorLibrary.DataAccess.Wagens
 {
     public class SingleWagenData : ISingleWagenData
     {
@@ -14,7 +14,7 @@ namespace DBInventorLibrary.DataAccess
         private const string CacheName = "WagensData";
 
 
-        public SingleWagenData(IDbConnection db,IMemoryCache cahce)
+        public SingleWagenData(IDbConnection db, IMemoryCache cahce)
         {
             _wagens = db.SingleWagenCollection;
             _cahce = cahce;
@@ -32,7 +32,7 @@ namespace DBInventorLibrary.DataAccess
                 output = result.ToList();
 
                 // how long the data will be in memory
-                _cahce.Set(CacheName,output,TimeSpan.FromSeconds(1));
+                _cahce.Set(CacheName, output, TimeSpan.FromSeconds(1));
             }
             return output;
         }
