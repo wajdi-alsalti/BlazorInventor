@@ -62,7 +62,7 @@
         if (wagensWithPosition.Count == 1)
         {
             // navigate directly to inventor surevy with list of wagens
-            navManger.NavigateTo($"/InventorSurvey/{wagensWithPosition.FirstOrDefault().Id}");
+            navManger.NavigateTo($"/InventorSurvey/{controllers.Id}/{wagensWithPosition.FirstOrDefault().Id}");
 
         }else
         {

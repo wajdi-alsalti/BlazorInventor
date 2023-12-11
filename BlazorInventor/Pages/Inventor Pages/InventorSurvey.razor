@@ -1,43 +1,108 @@
-﻿@page "/InventorSurvey/{Id}"
+﻿@page "/InventorSurvey/{ContollersId}/{Id}"
 @inject IBandsData bandData
 @inject ISingleWagenData wagenData
 @inject IMaterialsData materialData
+@inject IInventorControllerData inventorControllers
+@inject IInventorInformation inventorInfo
+@inject NavigationManager navManager
 
 <h3>Inventor Survey</h3>
-
-
-@if (firstItem is not null)
+@if (!ShowTablePreview)
 {
-    <div class="container">
-        <p> Article Name : @firstItem.Name</p>
-        <p> SapNumber : @firstItem.SapNumber</p>
-        <p> Quantity @firstItem.Quantity</p>
-        <input type="number" @bind="inventorItemSumme" placeholder="Summe"/>
-        <button class="btn btn-primary" @onclick="LoadNextMaterisl">Next</button>
+    <div class="container mt-3">
+        <EditForm Model="@firstItem" OnValidSubmit="AddItemsBeforeAddedToDB">
+            @if (wagen is not null)
+            {
+                <h2>@wagen.Name wagen</h2>
+            }
+            @if (firstItem is not null)
+            {
+                <div class="container border border-ligh rounded-2 ">
+                    
+                    <p class="mt-3"> <strong>Article Name :</strong>  @firstItem.Name</p>
+
+                    <div class="d-flex justify-content-center align-items-center mb-3">
+                        <img src="@firstItem.Image" alt="image" width="300" height="300"/>
+                    </div>
+
+                    <p> <strong>SapNumber : </strong> @firstItem.SapNumber</p>
+                    <p> <strong>Quantity : </strong> @firstItem.Quantity</p>
+                    <input class="form-control mb-3" type="number" @bind="inventorItemSumme" placeholder="Summe" disabled=@DisableInput() />
+                    <div class="d-flex justify-content-center align-items-center mb-3">
+                        <button class="btn btn-primary w-100">@buttonText</button>
+                    </div>
+                </div>
+            }
+        </EditForm>
     </div>
 }
 
+@if (ShowTablePreview)
+{
+    <div class="container">
+        <table class="table table-bordered align-middle">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Item Name</th>
+                    <th scope="col">SapNumber</th>
+                    <th scope="col">Quantinty</th>
+                    <th scope="col">Image</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < materialsControlled.Count; i++)
+                {
+                    <tr>
+                        <th scope="row">@(i+1)</th>
+                        <td>@materialsControlled[i].Name</td>
+                        <td>@materialsControlled[i].SapNumber</td>
+                        <td>@materialsControlled[i].Quantity</td>
+                        <td><img src="@materialsControlled[i].Image" alt="image" width="60" height="60" />  </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <div class="d-flex justify-content-center">
+            <button type="button" class="btn btn-primary" @onclick=@SendInventorData>Send To Admin</button>
+        </div>
+    </div>
+}
+
+<ToastInformation @ref=TostInfo Delay=@ToastModel.Delay Header=@ToastModel.ToastHeader Message=@ToastModel.ToastMessage ToastBg=@ToastModel.ToastBG/>
 
 @code {
+    private ToastInformation TostInfo { get; set; }
+    private ToastModel ToastModel = new();
+
     // id of the wagen
     [Parameter]
     public string Id { get; set; }
+
+    // ContollersId for the team who controlle the wagen
+    [Parameter]
+    public string ContollersId { get; set; }
 
     private SingleWagenModel wagen;
 
     private List<MaterialsModel> materialsList = new();
 
-    private MaterialsModel firstItem;
+    private MaterialsModel firstItem = new();
 
-    private int? inventorItemSumme;
+    private int inventorItemSumme;
 
     private int currentMaterialIndex = 0;
+
+    private string buttonText = "Next";
+
+    private List<MaterialsModel> materialsControlled = new();
+
+    private bool ShowTablePreview = false;
 
     protected override async Task OnInitializedAsync()
     {
         wagen = await wagenData.GetWagen(Id);
 
-        // materialsList = wagen.WagenMaterials;
         materialsList = await ConvertFromBasicModelToMaterial(wagen.WagenMaterials);
 
         firstItem = materialsList[currentMaterialIndex];
@@ -54,13 +119,98 @@
         return materialsList;
     }
 
-    private void LoadNextMaterisl()
+    private bool LoadNextMaterial()
     {
         currentMaterialIndex++;
         if (currentMaterialIndex < materialsList.Count)
         {
             firstItem = materialsList[currentMaterialIndex];
-
+            return true;
         }
+        return false;
+    }
+    private string ButtonText()
+    {
+        if (currentMaterialIndex < materialsList.Count)
+        {
+            buttonText = "Next";
+        }
+        else if (currentMaterialIndex == materialsList.Count)
+        {
+            buttonText = "Preview";
+        }
+
+        return buttonText;
+    }
+
+    private async Task AddItemsBeforeAddedToDB(EditContext context)
+    {
+        var result = (MaterialsModel)context.Model;
+        ButtonText();
+        ShowTable();
+        if (currentMaterialIndex < materialsList.Count)
+        {
+            if (inventorItemSumme <= result.Quantity)
+            {
+                result.Quantity = inventorItemSumme;
+                ButtonText();
+                LoadNextMaterial();
+                DisableInput();
+
+                materialsControlled.Add(result);
+            }else
+            {
+                await ShowToastInformation($"{inventorItemSumme} is more than the Quantity of the item {result.Quantity}");
+            }
+        }
+        inventorItemSumme = 0;
+    }
+
+    private bool DisableInput()
+    {
+        if (currentMaterialIndex < materialsList.Count)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    private void ShowTable()
+    {
+        if (buttonText == "Preview")
+        {
+            ShowTablePreview = true;
+        }
+    }
+
+    private async Task ShowToastInformation(string message)
+    {
+        ToastModel.ToastMessage = message;
+        ToastModel.ToastHeader = "Warrning";
+        ToastModel.ToastBG = "danger";
+        ToastModel.Delay = 5000;
+        await TostInfo.ShowToast();
+    }
+
+    private async Task SendInventorData()
+    {
+        // navManager.NavigateTo("/Inventor");
+        InventorModel inventorItems = new InventorModel();
+
+        inventorItems.Controllers = await inventorControllers.GetController(ContollersId);
+        // to find out which band we controlled
+        var band = await bandData.GetBand(inventorItems.Controllers.Bands);
+        inventorItems.BandNumber = band.Number;
+        // look after the wagen position from band table and the id of wagen we have from the url
+        var wagenPosition = band.Wagens.Where(i => i.Id == wagen.Id).FirstOrDefault();
+        inventorItems.WagenPosition = wagenPosition.Position;
+        
+        inventorItems.WagenName = wagen.Name;
+        inventorItems.MaterialsControllerd = materialsControlled;
+        inventorItems.HasBeenControllerd = true;
+        await inventorInfo.AddMaterialsAfterInventor(inventorItems);
     }
 }
