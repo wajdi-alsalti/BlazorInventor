@@ -1,7 +1,7 @@
 ﻿using DBInventorLibrary.Models.ControllerModels;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace DBInventorLibrary.DataAccess
+namespace DBInventorLibrary.DataAccess.Controllers
 {
     public class ControllerData : IControllerData
     {

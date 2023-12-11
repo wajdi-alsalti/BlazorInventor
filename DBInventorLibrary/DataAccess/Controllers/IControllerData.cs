@@ -1,6 +1,6 @@
 ﻿using DBInventorLibrary.Models.ControllerModels;
 
-namespace DBInventorLibrary.DataAccess
+namespace DBInventorLibrary.DataAccess.Controllers
 {
     public interface IControllerData
     {
