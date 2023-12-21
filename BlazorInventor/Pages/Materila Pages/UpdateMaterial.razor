@@ -1,6 +1,6 @@
 ﻿@page "/updateMaterila"
-@inject IMaterialsData materialsData
 
+@inject IDataBase<MaterialsModel> _materialsData
 @inject NavigationManager navManager
 
 
@@ -41,7 +41,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        materilasList = await materialsData.GetMaterialAsync();
+        materilasList = await _materialsData.GetAllAsync();
     }
 
     private void ItemDetails(MaterialsModel material)
@@ -53,9 +53,9 @@
 
     private async Task ItemDelete(MaterialsModel material)
     {
-        await materialsData.DeleteMaterila(material);
+        await _materialsData.DeleteAsync(material.Id);
 
-        materilasList = await materialsData.GetMaterialAsync();
+        materilasList = await _materialsData.GetAllAsync();
     }
    
 }

@@ -1,7 +1,14 @@
 ﻿@page "/InventorControllers"
-@inject IControllerData controllerData
-@inject IInventorControllerData inventorControllerData
-@inject IBandsData bandsData
+
+@*
+    @inject IControllerData controllerData
+    @inject IInventorControllerData inventorControllerData
+    @inject IBandsData bandsData
+*@
+
+@inject IDataBase<BandsModel> bandsData
+@inject IDataBase<InventorControllers> inventorControllerData
+@inject IDataBase<ControllerModel> controllerData
 
 <h3>Set Inventor Controllers</h3>
 <EditForm Model="@inventorControllers" OnValidSubmit="AddControllersToInventor">
@@ -80,10 +87,15 @@
     {
         // on initilize look after the controllers have a value false of HasBeenAdded
         // for do not duplicate a controller in another band
-        var controllers = await controllerData.GetControllerAsync();
+        var controllers = await controllerData.GetAllAsync();
         ControllersList = controllers.Where(x => x.HasBeenAdded == false).ToList();
 
-        BandsList = await bandsData.GetBandAsync();
+        BandsList = await BandsDetails();
+    }
+
+    private async Task<List<BandsModel>> BandsDetails()
+    {
+        return await bandsData.GetAllAsync();
     }
 
     private async Task AddControllersToInventor(EditContext context)
@@ -94,7 +106,7 @@
             var result = (InventorControllers)context.Model;
             if (!string.IsNullOrEmpty(result.Bands))
             {
-                await inventorControllerData.CreateController(result);
+                await inventorControllerData.AddNew(result);
                 await RefreshList();
             }
 
@@ -105,11 +117,11 @@
     // for reset HasBeenAdded to false just for test
     private async Task ResetHasBeenAdded()
     {
-        var controllers = await controllerData.GetControllerAsync();
+        var controllers = await controllerData.GetAllAsync();
         foreach (var controller in controllers)
         {
             controller.HasBeenAdded = false;
-            await controllerData.UpadteController(controller);
+            await controllerData.UpdateAsync(controller.Id,controller);
         }
     }
 
@@ -120,9 +132,9 @@
         // update the controller to add the true value to HassBeenAdded to true
         foreach (var controller in controllersInInventor)
         {
-            await controllerData.UpadteController(controller);
+            await controllerData.UpdateAsync(controller.Id,controller);
         }
-        var controllers = await controllerData.GetControllerAsync();
+        var controllers = await controllerData.GetAllAsync();
         ControllersList = controllers.Where(x => x.HasBeenAdded == false).ToList();
         ControllersListToInventor.Clear();
     }

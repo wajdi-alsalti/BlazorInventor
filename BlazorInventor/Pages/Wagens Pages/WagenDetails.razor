@@ -1,6 +1,6 @@
 ﻿@page "/WagenDetail/{Id}"
-@inject ISingleWagenData wagenData
 
+@inject IDataBase<SingleWagenModel> _wagenData
 <h3>@wagenDetails.Name Details</h3>
 
 
@@ -64,7 +64,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        wagenDetails = await wagenData.GetWagen(Id);
+        wagenDetails = await _wagenData.GetByIdAsync(Id);
     }
 
     private async Task UpdateWagenDetails(EditContext context)
@@ -85,7 +85,7 @@
         }
         // updatedWagen.WagenMaterials = basicMaterials;
 
-        await wagenData.UpadteWagen(updatedWagen);
+        await _wagenData.UpdateAsync(updatedWagen.Id,updatedWagen);
 
         await ShowToastDialog("Wagen has been Updated", $"{updatedWagen.Name} has saved in DB", "success");
 
@@ -96,7 +96,7 @@
     private async Task DeleteMaterila(BasicMaterialsModel material)
     {
         wagenDetails.WagenMaterials.Remove(material);
-        await wagenData.UpadteWagen(wagenDetails);
+        await _wagenData.UpdateAsync(wagenDetails.Id,wagenDetails);
 
         await ShowToastDialog("Warrning", $"{material.Name} has been removed from Wagen", "info");
     }

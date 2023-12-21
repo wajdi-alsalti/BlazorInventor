@@ -1,7 +1,7 @@
 ﻿@page "/AddBands"
 
-@inject IBandsData bandData
-@inject ISingleWagenData singleWagen
+@inject IDataBase<BandsModel> _bandData
+@inject IDataBase<SingleWagenModel> _singleWagen
 
 
 <h3>New Band</h3>
@@ -56,7 +56,7 @@
         band.Wagens = basicWagens;
         if (band.Wagens.Count > 0)
         {
-            await bandData.CreateBand(band);
+            await _bandData.AddNew(band);
             await ShowToastDialog("New Band", $"Band {band.Number} has been added", "success");
         }else
         {
@@ -67,7 +67,7 @@
         newBand = new();
         wagensToAdd.Clear();
         
-        wagens = await singleWagen.GetWagenAsync();
+        wagens = await _singleWagen.GetAllAsync();
 
     }
 

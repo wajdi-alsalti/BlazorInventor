@@ -1,7 +1,14 @@
 ﻿@page "/Inventor"
-@inject IControllerData controllerData
-@inject IBandsData bandData
+@inject IDataBase<ControllerModel> controllerData
+@inject IDataBase<BandsModel> bandData
+@inject IDataBase<InventorControllers> inventorControllers
+
+@*
+
 @inject IInventorControllerData inventorControllers
+*@
+
+
 @inject NavigationManager navManger
 
 <h3>Inventor Start Page</h3>
@@ -44,11 +51,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var all = await inventorControllers.GetControllerAsync();
+        var all = await inventorControllers.GetAllAsync();
         // TODO find way to replace the id of the InventorControllers id to show need to login system
-        controllers = await inventorControllers.GetController("656478c65cf57c8101a9f0c9");
+        controllers = await inventorControllers.GetByIdAsync("656478c65cf57c8101a9f0c9");
 
-        band = await bandData.GetBand(controllers.Bands);
+        band = await bandData.GetByIdAsync(controllers.Bands);
     }
 
     protected void NavigateToNextPage()

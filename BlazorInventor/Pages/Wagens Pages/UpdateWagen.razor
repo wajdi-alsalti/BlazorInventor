@@ -1,5 +1,6 @@
 ﻿@page "/updateWagen"
-@inject ISingleWagenData singleWagenData
+
+@inject IDataBase<SingleWagenModel> _singleWagen
 @inject NavigationManager navManager
 
 <div class="container">
@@ -32,7 +33,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        wagensList = await singleWagenData.GetWagenAsync();
+        wagensList = await _singleWagen.GetAllAsync();
     }
 
     private void ItemDetails(SingleWagenModel wagen)
@@ -44,8 +45,8 @@
 
     private async Task ItemDelete(SingleWagenModel wagen)
     {
-        await singleWagenData.DeleteWagen(wagen);
+        await _singleWagen.DeleteAsync(wagen.Id);
 
-        wagensList = await singleWagenData.GetWagenAsync();
+        wagensList = await _singleWagen.GetAllAsync();
     }
 }

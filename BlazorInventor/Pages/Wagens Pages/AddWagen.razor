@@ -1,7 +1,7 @@
 ﻿@page "/AddWagen"
 
-@inject IMaterialsData materialsData
-@inject ISingleWagenData singleWagen
+@inject IDataBase<SingleWagenModel> _singleWagen
+@inject IDataBase<MaterialsModel> _materialsData
 
 <h3>AddWagen</h3>
 
@@ -36,7 +36,7 @@
 
     private async Task<List<MaterialsModel>> GetMaterials()
     {
-        return await materialsData.GetMaterialAsync();
+        return await _materialsData.GetAllAsync();
     }
 
     private async Task AddWagenDB()
@@ -54,7 +54,7 @@
 
         single.WagenMaterials = basicMaterials;
         single.Name = newWagenModel.Name;
-        await singleWagen.CreateWagenTest(single);
+        await _singleWagen.AddNew(single);
 
         // clear the form and list to refresh after submit
         newWagenModel = new();

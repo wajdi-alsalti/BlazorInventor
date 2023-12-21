@@ -1,5 +1,5 @@
 ﻿@page "/updateBand"
-@inject IBandsData bandsData
+@inject IDataBase<BandsModel> _bandsData
 @inject NavigationManager navManager
 
 
@@ -38,7 +38,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        bandsList = await bandsData.GetBandAsync();
+        bandsList = await _bandsData.GetAllAsync();
     }
 
     private void ItemDetails(BandsModel band)
@@ -50,9 +50,9 @@
 
     private async Task ItemDelete(BandsModel band)
     {
-        await bandsData.DeleteBand(band);
+        await _bandsData.DeleteAsync(band.Id);
 
-        bandsList = await bandsData.GetBandAsync();
+        bandsList = await _bandsData.GetAllAsync();
     }
 
 }

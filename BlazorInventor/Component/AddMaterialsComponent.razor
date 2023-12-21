@@ -1,4 +1,9 @@
-﻿@inject IMaterialsData materialsData
+﻿
+@*
+
+@inject IMaterialsData materialsData
+*@
+@inject IDataBase<MaterialsModel> materialsData
 
 
 
@@ -54,7 +59,7 @@
 
     private async Task<List<MaterialsModel>> GetMaterials()
     {
-        return await materialsData.GetMaterialAsync();
+        return await materialsData.GetAllAsync();
     }
 
 

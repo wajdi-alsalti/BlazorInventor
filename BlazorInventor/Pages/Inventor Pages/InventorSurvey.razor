@@ -1,10 +1,22 @@
 ﻿@page "/InventorSurvey/{ContollersId}/{Id}"
+
+@*
+
 @inject IBandsData bandData
 @inject ISingleWagenData wagenData
 @inject IMaterialsData materialData
 @inject IInventorControllerData inventorControllers
 @inject IInventorInformation inventorInfo
+*@
+
 @inject NavigationManager navManager
+
+@inject IDataBase<BandsModel> bandData
+@inject IDataBase<SingleWagenModel> wagenData
+@inject IDataBase<MaterialsModel> materialData
+@inject IDataBase<InventorControllers> inventorControllers
+@inject IDataBase<InventorModel> inventorInfo
+
 
 <h3>Inventor Survey</h3>
 @if (!ShowTablePreview)
@@ -101,7 +113,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        wagen = await wagenData.GetWagen(Id);
+        wagen = await wagenData.GetByIdAsync(Id);
 
         materialsList = await ConvertFromBasicModelToMaterial(wagen.WagenMaterials);
 
@@ -113,7 +125,7 @@
         List<MaterialsModel> materialsList = new();
         foreach (var item in basicMaterials)
         {
-            var material = await materialData.GetMaterial(item.Id);
+            var material = await materialData.GetByIdAsync(item.Id);
             materialsList.Add(material);
         }
         return materialsList;
@@ -200,9 +212,9 @@
         // navManager.NavigateTo("/Inventor");
         InventorModel inventorItems = new InventorModel();
 
-        inventorItems.Controllers = await inventorControllers.GetController(ContollersId);
+        inventorItems.Controllers = await inventorControllers.GetByIdAsync(ContollersId);
         // to find out which band we controlled
-        var band = await bandData.GetBand(inventorItems.Controllers.Bands);
+        var band = await bandData.GetByIdAsync(inventorItems.Controllers.Bands);
         inventorItems.BandNumber = band.Number;
         // look after the wagen position from band table and the id of wagen we have from the url
         var wagenPosition = band.Wagens.Where(i => i.Id == wagen.Id).FirstOrDefault();
@@ -211,6 +223,6 @@
         inventorItems.WagenName = wagen.Name;
         inventorItems.MaterialsControllerd = materialsControlled;
         inventorItems.HasBeenControllerd = true;
-        await inventorInfo.AddMaterialsAfterInventor(inventorItems);
+        await inventorInfo.AddNew(inventorItems);
     }
 }

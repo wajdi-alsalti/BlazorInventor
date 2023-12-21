@@ -1,5 +1,5 @@
 ﻿@page "/BandDetail/{Id}"
-@inject IBandsData bandData
+@inject IDataBase<BandsModel> _bandData
 
 <h3>@bandDetail.Number Details</h3>
 <div class="container mb-3">
@@ -49,7 +49,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        bandDetail = await bandData.GetBand(Id);
+        bandDetail = await _bandData.GetByIdAsync(Id);
     }
 
     private void UpDateBand(EditContext context)
@@ -70,15 +70,15 @@
             updatedInfo.Wagens.Add(item);
         }
 
-        bandData.UpadteBand(updatedInfo);
+        _bandData.UpdateAsync(updatedInfo.Id,updatedInfo);
         wagensToAdd.Clear();
         showWagensToAdd = false;
     }
 
     private void DeleteWagenFromBand(BasicWagenModel wagenModel)
     {
-       bandDetail.Wagens.Remove(wagenModel);
-        bandData.UpadteBand(bandDetail);
+        bandDetail.Wagens.Remove(wagenModel);
+        _bandData.UpdateAsync(bandDetail.Id, bandDetail);
     }
 
     private void ShowWagens()

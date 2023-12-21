@@ -1,5 +1,6 @@
 ﻿@page "/AddController"
-@inject IControllerData controllerData
+
+@inject IDataBase<ControllerModel> _controllerData
 @inject NavigationManager navManager
 
 <div class="container">
@@ -29,7 +30,7 @@
         controller.Name = addedController.Name;
         controller.Number = addedController.Number;
 
-        await controllerData.CreateController(controller);
+        await _controllerData.AddNew(controller);
         navManager.NavigateTo("/UpdateController");
 
     }

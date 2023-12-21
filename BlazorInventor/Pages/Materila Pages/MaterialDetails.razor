@@ -1,5 +1,6 @@
 ﻿@page "/MaterialDetail/{Id}"
-@inject IMaterialsData materialsData
+
+@inject IDataBase<MaterialsModel> _materialsData
 @inject IConfiguration config
 @inject NavigationManager navManager
 <h3>@material.Name Details</h3>
@@ -60,14 +61,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-        material = await materialsData.GetMaterial(Id);
+        material = await _materialsData.GetByIdAsync(Id);
     }
 
     private async Task UpDateMaterial(EditContext context)
     {
+        // TODO fix the problem if update item image will delete it and need to update
         var updatedMaterial = (MaterialsModel)context.Model;
         updatedMaterial.Image = await CaptureFile();
-        await materialsData.UpadteMaterial(updatedMaterial);
+        await _materialsData.UpdateAsync(updatedMaterial.Id, updatedMaterial);
         navManager.NavigateTo("/updateMaterila");
     }
 
@@ -116,7 +118,7 @@
     }
     private async Task<bool> CheckIfItemSaved(MaterialsModel material)
     {
-        var materialsInDB = await materialsData.GetMaterialAsync();
+        var materialsInDB = await _materialsData.GetAllAsync();
         // max number of the sapNumber in DB
         var maxSapNumber = materialsInDB.Max(s => s.SapNumber);
 

@@ -1,5 +1,6 @@
 ﻿@page "/ControllerDetails/{Id}"
-@inject IControllerData controllerData
+
+@inject IDataBase<ControllerModel> _controllerData
 @inject NavigationManager navManager
 
 <h3> @Controller.Name Details</h3>
@@ -25,7 +26,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Controller = await controllerData.GetController(Id);
+        Controller = await _controllerData.GetByIdAsync(Id);
     }
 
     private async void UpDateController(EditContext context)
@@ -35,7 +36,7 @@
         Controller.Name = updatedController.Name;
         Controller.Number = updatedController.Number;
 
-        await controllerData.UpadteController(Controller);
+        await _controllerData.UpdateAsync(updatedController.Id,Controller);
         navManager.NavigateTo("/UpdateController");
     }
 }

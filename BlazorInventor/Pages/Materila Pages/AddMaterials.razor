@@ -1,5 +1,6 @@
 ﻿@page "/AddMaterials"
-@inject IMaterialsData materialsData
+
+@inject IDataBase<MaterialsModel> _materialsData
 @inject IConfiguration config
 
 
@@ -127,7 +128,7 @@
 
         if (await CheckIfItemSaved(material) == true)
         {
-            await materialsData.CreateMaterial(material);
+            await _materialsData.AddNew(material);
 
             await ShowToastDialog("New Material Added", $"Material {material.Name} has been Addedd Succefully","success");
 
@@ -146,7 +147,7 @@
 
     private async Task<bool> CheckIfItemSaved(MaterialsModel material)
     {
-        var materialsInDB = await materialsData.GetMaterialAsync();
+        var materialsInDB = await _materialsData.GetAllAsync();
         // max number of the sapNumber in DB
         var maxSapNumber = materialsInDB.Max(s => s.SapNumber);
 

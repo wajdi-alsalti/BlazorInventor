@@ -1,5 +1,6 @@
 ﻿@page "/UpdateController"
-@inject IControllerData controllerData
+
+@inject IDataBase<ControllerModel> _controllerData
 @inject NavigationManager navManager
 
 
@@ -33,7 +34,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        ControllersList = await controllerData.GetControllerAsync();
+        ControllersList = await _controllerData.GetAllAsync();
     }
 
     private void ItemDetails(ControllerModel controller)
@@ -45,8 +46,8 @@
 
     private async Task ItemDelete(ControllerModel controller)
     {
-        await controllerData.DeleteController(controller);
+        await _controllerData.DeleteAsync(controller.Id);
 
-        ControllersList = await controllerData.GetControllerAsync();
+        ControllersList = await _controllerData.GetAllAsync();
     }
 }
