@@ -1,5 +1,16 @@
 ﻿@page "/"
 @inject IMaterialsData materilaData
+@inject IInventorInformation inventorMaterials
+@using System.IO
+@using System.Text
+@inject IJSRuntime JS
+
+@inject IDataBase<BandsModel> dataBase
+@inject IDataBase<SingleWagenModel> dataWagen
+@inject IDataBase<ControllerModel> dataController
+@inject IDataBase<InventorModel> dataInventor
+@inject IDataBase<MaterialsModel> dataMaterials
+
 
 <PageTitle>Index</PageTitle>
 
@@ -35,7 +46,6 @@ Welcome to your new app.
     }
 </div>
 
-
 @if (!string.IsNullOrWhiteSpace(selectedmaterialsName))
 {
     <p class="mt-3">
@@ -43,7 +53,12 @@ Welcome to your new app.
     </p>
 }
 
-<ModalTeast/>
+<button class="btn btn-primary" @onclick="DownloadFileFromStream">
+    Download File
+</button>
+
+
+<button class="btn btn-primary" @onclick=RetriveData>Abstract</button>
 
 @code{
 
@@ -69,7 +84,8 @@ Welcome to your new app.
         filter = e.Value?.ToString();
         if (filter?.Length > 2)
         {
-            var filterMaterila = await materilaData.GetMaterialAsync();
+            // var filterMaterila = await materilaData.GetMaterialAsync();
+            var filterMaterila = await dataMaterials.GetAllAsync();
             materials = filterMaterila.Where(material => material.Name.Contains(filter, StringComparison.InvariantCultureIgnoreCase)).ToList();
         }
         else
@@ -86,4 +102,88 @@ Welcome to your new app.
         materials = null;
     }
 
+
+    #region download files
+    // functions to download file
+    private async Task<Stream> GetFileStream()
+    {
+        // here the data we need to show
+        var randomBinaryData = await GenerateCsvContentFromDatabase();
+        var fileStream = new MemoryStream(randomBinaryData);
+
+        return fileStream;
+    }
+
+    public async Task<byte[]> GenerateCsvContentFromDatabase()
+    {
+        List<string> controllersName = new();
+        // Retrieve data from the database
+        // var materilasInventor = await inventorMaterials.GetmaterialsAsync();
+        var materilasInventor = await dataInventor.GetAllAsync();
+
+        //create a simple CSV with headers
+        List<string> csvLines = new List<string>
+        {
+            "Controllers, Band, Wagen,Wagen Position, Materials Name,Materials SapNumber,Material Quantity",
+        };
+
+        // loop inside the table in db
+        foreach (var item in materilasInventor)
+        {
+            // controllers name
+            controllersName = item.Controllers.Controllers.Select(n => n.Name).ToList();
+
+            // loop in MaterialsControllerd to have data
+            foreach (var material in item.MaterialsControllerd)
+            {
+                var line = $"{controllersName[0]} & {controllersName[1]},{item.BandNumber},{item.WagenName},{item.WagenPosition},{material.Name},{material.SapNumber},{material.Quantity}";
+                csvLines.Add(line);
+            }
+        }
+
+        string csvContent = string.Join(Environment.NewLine, csvLines);
+        byte[] fileContent = Encoding.UTF8.GetBytes(csvContent);
+
+        return fileContent;
+    }
+
+    private async Task DownloadFileFromStream()
+    {
+        var fileStream = await GetFileStream();
+        var fileName = "log.csv";
+
+        using var streamRef = new DotNetStreamReference(stream: fileStream);
+
+        await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+    }
+    #endregion
+
+    #region using abstract class to get data from DB
+    async Task RetriveData()
+    {
+        // var bands = await dataBase.GetAllData();
+        // var wagens = await dataWagen.GetAllData();
+        // dataController.Delete("658440dff71ecfe119f38614");
+        // ControllerModel controllerModel = new()
+        //     {
+        //         Name = "test",
+        //         Number = 50016,
+        //         ObjectIdentifer = null,
+        //         HasBeenAdded = false,
+        //     };
+
+        
+        // controllerModel.Number = 50055;
+        // controllerModel.HasBeenAdded = true;
+        // controllerModel.Name = "testUpdate";
+
+        // dataController.Insert(controllerModel);
+        var controllers = await dataController.GetByIdAsync("6584415dab3ca1116bf0c53b");
+        controllers.Number = 50095;
+        controllers.HasBeenAdded = true;
+        controllers.Name = "ohla";
+
+        await dataController.UpdateAsync(controllers.Id, controllers);
+    }
+    #endregion
 }
