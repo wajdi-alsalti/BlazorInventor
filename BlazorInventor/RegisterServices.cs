@@ -1,22 +1,17 @@
-﻿using DBInventorLibrary.DataAccess;
-using DBInventorLibrary.DataAccess.Bands;
-using DBInventorLibrary.DataAccess.Controllers;
-using DBInventorLibrary.DataAccess.InventorData;
-using DBInventorLibrary.DataAccess.InventorData.InventorMaterials;
-using DBInventorLibrary.DataAccess.Materials;
-using DBInventorLibrary.DataAccess.Wagens;
-using DBInventorLibrary.DataAccessAbstract.Bands;
+﻿using DBInventorLibrary.DataAccessAbstract.Bands;
 using DBInventorLibrary.DataAccessAbstract.Controllers;
 using DBInventorLibrary.DataAccessAbstract.InventorData.Controllers;
 using DBInventorLibrary.DataAccessAbstract.InventorData.Materials;
 using DBInventorLibrary.DataAccessAbstract.Materilas;
-using DBInventorLibrary.DataAccessAbstract.Services;
 using DBInventorLibrary.DataAccessAbstract.Wagens;
+
 using DBInventorLibrary.Models.Bands;
 using DBInventorLibrary.Models.ControllerModels;
 using DBInventorLibrary.Models.Inventor;
 using DBInventorLibrary.Models.MaterialsModels;
 using DBInventorLibrary.Models.WagensModel;
+
+using MongoDBConnectionClassLibrary.Data_Services;
 
 namespace BlazorInventor
 {
@@ -29,22 +24,13 @@ namespace BlazorInventor
             builder.Services.AddServerSideBlazor();
             builder.Services.AddMemoryCache();
 
-
-            builder.Services.AddSingleton<IDbConnection, DbConnection>();
-            builder.Services.AddSingleton<IBandsData, BandsData>();
-            builder.Services.AddSingleton<IControllerData, ControllerData>();
-            builder.Services.AddSingleton<IMaterialsData, MaterialsData>();
-            builder.Services.AddSingleton<ISingleWagenData, SingleWagenData>();
-            builder.Services.AddSingleton<IInventorControllerData, InventorControllerData>();
-            builder.Services.AddSingleton<IInventorInformation, InventorInformation>();
-
-            // test abstract class
-            builder.Services.AddSingleton<IDataBase<BandsModel>, BandsAbstract>();
-            builder.Services.AddSingleton<IDataBase<ControllerModel>, ControllersAbstract>();
-            builder.Services.AddSingleton<IDataBase<MaterialsModel>, MaterialsAbstract>();
-            builder.Services.AddSingleton<IDataBase<SingleWagenModel>, WagensAbstract>();
-            builder.Services.AddSingleton<IDataBase<InventorModel>, InventorMaterialsDataAbstract>();
-            builder.Services.AddSingleton<IDataBase<InventorControllers>, InventorControllersDataAbstract>();
+            // Data Base library handel CRUD 
+            builder.Services.AddSingleton<IDataAccessLibrary<BandsModel>, BandsAbstract>();
+            builder.Services.AddSingleton<IDataAccessLibrary<ControllerModel>, ControllersAbstract>();
+            builder.Services.AddSingleton<IDataAccessLibrary<MaterialsModel>, MaterialsAbstract>();
+            builder.Services.AddSingleton<IDataAccessLibrary<SingleWagenModel>, WagensAbstract>();
+            builder.Services.AddSingleton<IDataAccessLibrary<InventorModel>, InventorMaterialsDataAbstract>();
+            builder.Services.AddSingleton<IDataAccessLibrary<InventorControllers>, InventorControllersDataAbstract>();
 
             // for localization
 

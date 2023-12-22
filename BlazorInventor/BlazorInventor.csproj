@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DBInventorLibrary\DBInventorLibrary.csproj" />
+    <ProjectReference Include="..\MongoDBConnectionClassLibrary\MongoDBConnectionClassLibrary.csproj" />
   </ItemGroup>
 
   <ItemGroup>

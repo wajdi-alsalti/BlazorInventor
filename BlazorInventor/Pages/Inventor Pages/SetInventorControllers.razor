@@ -1,14 +1,8 @@
 ﻿@page "/InventorControllers"
 
-@*
-    @inject IControllerData controllerData
-    @inject IInventorControllerData inventorControllerData
-    @inject IBandsData bandsData
-*@
-
-@inject IDataBase<BandsModel> bandsData
-@inject IDataBase<InventorControllers> inventorControllerData
-@inject IDataBase<ControllerModel> controllerData
+@inject IDataAccessLibrary<BandsModel> bandsData
+@inject IDataAccessLibrary<InventorControllers> inventorControllerData
+@inject IDataAccessLibrary<ControllerModel> controllerData
 
 <h3>Set Inventor Controllers</h3>
 <EditForm Model="@inventorControllers" OnValidSubmit="AddControllersToInventor">

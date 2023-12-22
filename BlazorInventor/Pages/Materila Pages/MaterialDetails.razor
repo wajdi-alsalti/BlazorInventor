@@ -1,6 +1,6 @@
 ﻿@page "/MaterialDetail/{Id}"
 
-@inject IDataBase<MaterialsModel> _materialsData
+@inject IDataAccessLibrary<MaterialsModel> _materialsData
 @inject IConfiguration config
 @inject NavigationManager navManager
 <h3>@material.Name Details</h3>

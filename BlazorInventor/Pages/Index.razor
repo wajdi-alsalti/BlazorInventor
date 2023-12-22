@@ -1,16 +1,17 @@
 ﻿@page "/"
-@inject IMaterialsData materilaData
-@inject IInventorInformation inventorMaterials
+
 @using System.IO
 @using System.Text
+
 @inject IJSRuntime JS
 
-@inject IDataBase<BandsModel> dataBase
-@inject IDataBase<SingleWagenModel> dataWagen
-@inject IDataBase<ControllerModel> dataController
-@inject IDataBase<InventorModel> dataInventor
-@inject IDataBase<MaterialsModel> dataMaterials
+@inject IDataAccessLibrary<BandsModel> dataBase
+@inject IDataAccessLibrary<SingleWagenModel> dataWagen
+@inject IDataAccessLibrary<ControllerModel> dataController
+@inject IDataAccessLibrary<InventorModel> dataInventor
+@inject IDataAccessLibrary<MaterialsModel> dataMaterials
 
+@inject IDataAccessLibrary<BandsModel> dataBaseLibrary
 
 <PageTitle>Index</PageTitle>
 
@@ -58,7 +59,7 @@ Welcome to your new app.
 </button>
 
 
-<button class="btn btn-primary" @onclick=RetriveData>Abstract</button>
+<button class="btn btn-primary" @onclick=RetrieveDataFromClassLibrary>Class Abstract</button>
 
 @code{
 
@@ -172,7 +173,7 @@ Welcome to your new app.
         //         HasBeenAdded = false,
         //     };
 
-        
+
         // controllerModel.Number = 50055;
         // controllerModel.HasBeenAdded = true;
         // controllerModel.Name = "testUpdate";
@@ -186,4 +187,11 @@ Welcome to your new app.
         await dataController.UpdateAsync(controllers.Id, controllers);
     }
     #endregion
+
+    async Task RetrieveDataFromClassLibrary()
+    {
+        var bands = await dataBaseLibrary.GetAllAsync();
+
+        // await dataBaseLibrary.DeleteAsync("658552c50c03f55af1c7b78c");
+    }
 }

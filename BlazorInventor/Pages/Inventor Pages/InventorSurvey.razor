@@ -1,21 +1,13 @@
 ﻿@page "/InventorSurvey/{ContollersId}/{Id}"
 
-@*
-
-@inject IBandsData bandData
-@inject ISingleWagenData wagenData
-@inject IMaterialsData materialData
-@inject IInventorControllerData inventorControllers
-@inject IInventorInformation inventorInfo
-*@
 
 @inject NavigationManager navManager
 
-@inject IDataBase<BandsModel> bandData
-@inject IDataBase<SingleWagenModel> wagenData
-@inject IDataBase<MaterialsModel> materialData
-@inject IDataBase<InventorControllers> inventorControllers
-@inject IDataBase<InventorModel> inventorInfo
+@inject IDataAccessLibrary<BandsModel> bandData
+@inject IDataAccessLibrary<SingleWagenModel> wagenData
+@inject IDataAccessLibrary<MaterialsModel> materialData
+@inject IDataAccessLibrary<InventorControllers> inventorControllers
+@inject IDataAccessLibrary<InventorModel> inventorInfo
 
 
 <h3>Inventor Survey</h3>

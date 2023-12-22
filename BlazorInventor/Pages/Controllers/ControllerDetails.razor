@@ -1,6 +1,6 @@
 ﻿@page "/ControllerDetails/{Id}"
 
-@inject IDataBase<ControllerModel> _controllerData
+@inject IDataAccessLibrary<ControllerModel> _controllerData
 @inject NavigationManager navManager
 
 <h3> @Controller.Name Details</h3>
