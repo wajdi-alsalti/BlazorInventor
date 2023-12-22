@@ -1,13 +1,13 @@
-﻿using DBInventorLibrary.DataAccessAbstract.Services;
-using DBInventorLibrary.Models.Bands;
+﻿using DBInventorLibrary.Models.Bands;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using MongoDBConnectionClassLibrary.Data_Services;
 
 namespace DBInventorLibrary.DataAccessAbstract.Bands
 {
-    public class BandsAbstract : DataBase<BandsModel>, IDataBase<BandsModel>
+    public class BandsAbstract : DataAccessLibrary<BandsModel>, IDataAccessLibrary<BandsModel>
     {
-        public BandsAbstract(IConfiguration config, IMemoryCache cahce) : base(config, "Bands", cahce,nameof(BandsModel))
+        public BandsAbstract(IConfiguration config, IMemoryCache cahce) : base(config, cahce, "DatabaseName", "MongoDB", "Bands", nameof(BandsModel))
         {
         }
     }
