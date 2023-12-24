@@ -1,0 +1,190 @@
+﻿@typeparam T
+
+@inject IDataAccessLibrary<T> ItemsData
+
+<button type="button" class="btn btn-primary" @onclick="ShowModal">Add Items</button>
+<div class="modal" style="display: @(showModal ? "block" : "none")">
+    <div class="container modal-content">
+        <div class="autocomplete w-25">
+            <input placeholder="Search for Wagens" @bind=selectedmaterialsName @oninput=HandleInput class="form-control filter" />
+        </div>
+
+        <label for="wagenList">Add new Item</label>
+        <div class="container">
+            @*list of the Items*@
+            <div>
+                @if (Items is not null)
+                {
+                    <div class="overflow-auto p-3 containerComponentHeight">
+                        <ul class="list-group">
+                            @foreach (var item in Items)
+                            {
+                                <li class="list-group-item list-group-item-primary" role="button" @onclick=@(()=> ItemAddToListClicked(item))>@ContextRender(item)</li>
+                            }
+                        </ul>
+                    </div>
+                }
+            </div>
+
+        </div>
+        <div class="container mt-3">
+            <label for="materialsadded">Items added</label>
+            @*List of the added Items *@
+            @if (ItemsToAdd is not null)
+            {
+                <div class="overflow-auto p-3 containerComponentHeight">
+                    <ul class="list-group">
+                        @foreach (var item in ItemsToAdd)
+                        {
+                            <div class="row ">
+                                <div class="col-xl-9">
+                            <li class="list-group-item list-group-item-success" @onclick="(()=> ItemRemoveFromListClicked(item))">@ContextRender(item)</li>
+                                </div>
+                            </div>
+                        }
+                    </ul>
+                </div>
+            }
+        </div>
+        <div class="center-children">
+            <button type="button" class="btn btn-primary" @onclick=HideModal> Done </button>
+        </div>
+    </div>
+
+</div>
+
+
+@code {
+
+    private bool showModal = false;
+    /// <summary>
+    /// list of Items we have from DB
+    /// </summary>
+    public List<T> Items { get; set; }
+
+    /// <summary>
+    /// list of the Items we added to new Table DB
+    /// </summary>
+    [Parameter]
+    public List<T> ItemsToAdd { get; set; }
+
+    /// <summary>
+    /// use ContextRender to show the value of the model by using @context
+    /// </summary>
+    [Parameter]
+    public RenderFragment<T> ContextRender{ get; set; }
+
+    /// <summary>
+    /// Retrieve all Data From Data Base
+    /// </summary>
+    /// <returns></returns>
+    protected override async Task OnInitializedAsync()
+    {
+        Items = await ItemsData.GetAllAsync();
+    }
+
+    /// <summary>
+    /// add item in list after click
+    /// </summary>
+    /// <param name="item">Item of Type T</param>
+    private void ItemAddToListClicked(T item)
+    {
+        // add the value from input to selected wagen
+
+        if (ItemsToAdd is not null)
+        {
+            ItemsToAdd.Add(item);
+        }
+
+        if (Items is not null)
+        {
+            Items.Remove(item);
+        }
+    }
+
+    /// <summary>
+    /// remove item from the list
+    /// </summary>
+    /// <param name="item">Item of Type T</param>
+    private void ItemRemoveFromListClicked(T item)
+    {
+        if (Items is not null)
+        {
+            Items.Add(item);
+        }
+
+        if (ItemsToAdd is not null)
+        {
+            ItemsToAdd.Remove(item);
+        }
+    }
+
+
+    private void ShowModal()
+    {
+        showModal = true;
+    }
+    private void HideModal()
+    {
+        showModal = false;
+    }
+    private void Save()
+    {
+        // Handle the saved data here
+        // You can use 'InputData' to get the value entered in the input field
+        // For example, you could raise an event to pass the data to the parent component
+        // or store it in a service, etc.
+
+        // Close the modal after saving
+        HideModal();
+    }
+
+    #region Logic to search for Items
+
+    /// <summary>
+    /// the text we add in text box
+    /// </summary>
+    private string inputText = string.Empty;
+    private string selectedmaterialsName = string.Empty;
+
+    /// <summary>
+    /// delegate handelt the filter data
+    /// </summary>
+    [Parameter]
+    public Func<T,bool> ItemsFilter{ get; set; }
+
+    /// <summary>
+    /// Event triggerd when add text in Text Box to search for Items
+    /// need to add function handel the output from the seach bar
+    /// (Example) string? filterTyping;
+    /// private void FilterOutPut(string data)
+    /// {
+    ///     filterTyping = data;
+    /// }
+    /// </summary>
+    
+    [Parameter]
+    public EventCallback<string> OnTypingFilter{ get; set; }
+    // auto complete functions
+    private async Task HandleInput(ChangeEventArgs e)
+    {
+        var itemsData = await ItemsData.GetAllAsync();
+        inputText = e.Value?.ToString();
+        await OnTypingFilter.InvokeAsync(inputText);
+        if (inputText?.Length >= 2)
+        {
+            Items = itemsData.Where(ItemsFilter).ToList();
+        }
+        else if (inputText?.Length == 0)
+        {
+            Items = itemsData;
+        }
+        else if (string.IsNullOrEmpty(selectedmaterialsName))
+        {
+            Items = itemsData;
+        }
+    }
+
+    #endregion
+    
+}
