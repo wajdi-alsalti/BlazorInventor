@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorInventor", "BlazorInv
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DBInventorLibrary", "DBInventorLibrary\DBInventorLibrary.csproj", "{245CA467-3571-4B1B-81D6-565DBF583735}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoDBConnectionClassLibrary", "MongoDBConnectionClassLibrary\MongoDBConnectionClassLibrary.csproj", "{6F63F359-C988-426C-89C4-880FBD1EC3E1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MongoDBConnectionClassLibrary", "MongoDBConnectionClassLibrary\MongoDBConnectionClassLibrary.csproj", "{6F63F359-C988-426C-89C4-880FBD1EC3E1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

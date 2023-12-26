@@ -15,7 +15,18 @@
                     <input class="form-control" type="text" @bind-value=@wagenDetails.Name />
                 </div>
                 <div class="col-xl-3 pt-4">
-                    <button type="button" class="btn btn-outline-primary" @onclick="ShowMaterilas">Add Materilas</button>
+                    <ModalTransperent ButtonName="Add New Materials">
+                        <ContextElements>
+                            <AddItemsComponent T="MaterialsModel" ItemsToAdd="@addedmaterilasList" ItemsFilter="@(x => x.Name.Contains(filterTyping, StringComparison.InvariantCultureIgnoreCase))" OnTypingFilter="FilterOutPut">
+                                <ContextItemsRender>
+                                    @context.Name
+                                </ContextItemsRender>
+                                <ContextAddedItemsRender>
+                                    @context.Name
+                                </ContextAddedItemsRender>
+                            </AddItemsComponent>
+                        </ContextElements>
+                    </ModalTransperent>
                 </div>
             </div>
         </div>
@@ -40,22 +51,8 @@
     </EditForm>
 </div>
         
-@if (showMaterilasToAdd)
-{
-    <div class="container"> 
-        <AddMaterialsComponent AddedmaterilasList="addedmaterilasList" />
-    </div>
-}
 @code {
-    public string ToastHeader { get; set; }
-    public string ToastMessage { get; set; }
-    public string ToastBG { get; set; }
-
-    private ToastInformation TostInfo { get; set; }
-
     private List<MaterialsModel> addedmaterilasList = new();
-
-    private bool showMaterilasToAdd = false;
 
     [Parameter]
     public string Id { get; set; }
@@ -89,7 +86,6 @@
 
         await ShowToastDialog("Wagen has been Updated", $"{updatedWagen.Name} has saved in DB", "success");
 
-        showMaterilasToAdd = false;
         addedmaterilasList.Clear();
     }
 
@@ -101,6 +97,12 @@
         await ShowToastDialog("Warrning", $"{material.Name} has been removed from Wagen", "info");
     }
 
+    public string ToastHeader { get; set; }
+    public string ToastMessage { get; set; }
+    public string ToastBG { get; set; }
+
+    private ToastInformation TostInfo { get; set; }
+
     private async Task ShowToastDialog(string header, string message, string toastBG)
     {
         ToastHeader = header;
@@ -110,8 +112,11 @@
         await TostInfo.ShowToast();
     }
 
-    private void ShowMaterilas()
+
+    string? filterTyping;
+
+    private void FilterOutPut(string data)
     {
-        showMaterilasToAdd = true;
+        filterTyping = data;
     }
 }

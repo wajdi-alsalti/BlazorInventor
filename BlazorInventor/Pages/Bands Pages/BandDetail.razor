@@ -4,7 +4,35 @@
 <h3>@bandDetail.Number Details</h3>
 <div class="container mb-3">
     <div class="float-end mt-4 ms-1">
-        <button type="button" class="btn btn-success" @onclick="ShowWagens">Add Wagens</button>
+        <ModalTransperent ButtonName="Add New Wagen">
+            <ContextElements>
+                <AddItemsComponent T="SingleWagenModel" ItemsToAdd="@wagensToAdd" ItemsFilter="@(x => x.Name.Contains(filterTyping, StringComparison.InvariantCultureIgnoreCase))" OnTypingFilter="FilterOutPut">
+                    <ContextItemsRender>
+                        @context.Name
+                    </ContextItemsRender>
+                    <ContextAddedItemsRender>
+                        <div class="row">
+                            @*name of items*@
+                            <div class="col-9">
+                                @context.Name
+                            </div>
+
+                            <div class="col-3">
+                                @*label*@
+                                <label for="wagenPosition">Wagen Position</label>
+                                @*select the wagen position*@
+                                <select class="form-select" @bind="@context.Position">
+                                    @for (int position = 1; position < 10; position++)
+                                    {
+                                        <option>@position</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </ContextAddedItemsRender>
+                </AddItemsComponent>
+            </ContextElements>
+        </ModalTransperent>
     </div>
     <EditForm Context="UpDateBand" OnValidSubmit="UpDateBand" Model=@bandDetail>
         <div>
@@ -26,20 +54,12 @@
     </EditForm>
 </div>
 
-@if (showWagensToAdd)
-{
-    <div class="container">
-        <AddWagenComponent wagensToAdd="@wagensToAdd"/>
-    </div>
-}
-
 @code {
     [Parameter]
     public string Id { get; set; }
 
     private BandsModel bandDetail = new();
 
-    private bool showWagensToAdd = false;
 
     /// <summary>
     /// list of the wagens we added to band
@@ -72,7 +92,6 @@
 
         _bandData.UpdateAsync(updatedInfo.Id,updatedInfo);
         wagensToAdd.Clear();
-        showWagensToAdd = false;
     }
 
     private void DeleteWagenFromBand(BasicWagenModel wagenModel)
@@ -81,8 +100,10 @@
         _bandData.UpdateAsync(bandDetail.Id, bandDetail);
     }
 
-    private void ShowWagens()
+    string? filterTyping;
+
+    private void FilterOutPut(string data)
     {
-        showWagensToAdd = true;
+        filterTyping = data;
     }
 }

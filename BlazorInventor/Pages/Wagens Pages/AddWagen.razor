@@ -7,7 +7,7 @@
 
 <ToastInformation @ref=TostInfo Message=@Toast.ToastMessage Delay=@Toast.Delay Header=@Toast.ToastHeader ToastBg=@Toast.ToastBG />
 
-<EditForm Model="@newWagenModel" OnValidSubmit="@AddWagenDB">
+<EditForm Model="@newWagenModel" OnValidSubmit="@AddWagenDB" Context="newWagen">
     <DataAnnotationsValidator />
     <ValidationSummary />
         <div class="row">
@@ -16,7 +16,19 @@
                     <label for="wagen">Wagen Name</label>
                     <InputText id="wagen" class="form-control" placeholder="Add Wagen name" @bind-Value=newWagenModel.Name />
                 </div>
-                <AddMaterialsComponent AddedmaterilasList="@addedmaterilasList"/>
+                
+                <AddItemsComponent T="MaterialsModel" ItemsToAdd="@addedmaterilasList" 
+                    ItemsFilter="@(x=>x.Name.Contains(filterTyping,StringComparison.InvariantCultureIgnoreCase))" 
+                    OnTypingFilter="FilterOutPut">
+                    <ContextItemsRender>
+                        @context.Name
+                    </ContextItemsRender>
+                    <ContextAddedItemsRender>
+                        @context.Name
+                    </ContextAddedItemsRender>
+                </AddItemsComponent>
+
+               
                 <div class="center-children">
                     <button type="submit" class="btn btn-primary"> Add Wagen</button>
                 </div>
@@ -26,14 +38,8 @@
 
 @code {
     private List<MaterialsModel> addedmaterilasList = new();
-
     private WagensUiModel newWagenModel = new();
-
-
-    private ToastInformation TostInfo { get; set; }
-    private ToastModel Toast = new();
     
-
     private async Task<List<MaterialsModel>> GetMaterials()
     {
         return await _materialsData.GetAllAsync();
@@ -60,6 +66,10 @@
         newWagenModel = new();
         addedmaterilasList.Clear();
     }
+
+    private ToastInformation TostInfo { get; set; }
+    private ToastModel Toast = new();
+
     private async Task ShowToastDialog(string header, string message, string toastBG)
     {
         Toast.ToastHeader = header;
@@ -68,5 +78,12 @@
         Toast.Delay = 3000;
 
         await TostInfo.ShowToast();
+    }
+
+    string? filterTyping;
+
+    private void FilterOutPut(string data)
+    {
+        filterTyping = data;
     }
 }

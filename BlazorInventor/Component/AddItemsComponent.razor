@@ -2,61 +2,58 @@
 
 @inject IDataAccessLibrary<T> ItemsData
 
-<button type="button" class="btn btn-primary" @onclick="ShowModal">Add Items</button>
-<div class="modal" style="display: @(showModal ? "block" : "none")">
-    <div class="container modal-content">
-        <div class="autocomplete w-25">
-            <input placeholder="Search for Wagens" @bind=selectedmaterialsName @oninput=HandleInput class="form-control filter" />
-        </div>
+<div class="container">
+    @* search bar for Items *@
+    <div class="autocomplete w-100">
+        <input placeholder="Search" @bind=selectedItemsName @oninput=HandleInput class="form-control filter" />
+    </div>
 
-        <label for="wagenList">Add new Item</label>
-        <div class="container">
-            @*list of the Items*@
-            <div>
-                @if (Items is not null)
-                {
-                    <div class="overflow-auto p-3 containerComponentHeight">
-                        <ul class="list-group">
-                            @foreach (var item in Items)
-                            {
-                                <li class="list-group-item list-group-item-primary" role="button" @onclick=@(()=> ItemAddToListClicked(item))>@ContextRender(item)</li>
-                            }
-                        </ul>
-                    </div>
-                }
-            </div>
-
-        </div>
-        <div class="container mt-3">
-            <label for="materialsadded">Items added</label>
-            @*List of the added Items *@
-            @if (ItemsToAdd is not null)
+    <label for="wagenList">Add new Item</label>
+    <div class="container">
+        @*list of the Items*@
+        <div>
+            @if (Items is not null)
             {
                 <div class="overflow-auto p-3 containerComponentHeight">
                     <ul class="list-group">
-                        @foreach (var item in ItemsToAdd)
+                        @foreach (var item in Items)
                         {
-                            <div class="row ">
-                                <div class="col-xl-9">
-                            <li class="list-group-item list-group-item-success" @onclick="(()=> ItemRemoveFromListClicked(item))">@ContextRender(item)</li>
-                                </div>
-                            </div>
+                            <li class="list-group-item list-group-item-primary" role="button" @onclick=@(()=> ItemAddToListClicked(item))>@ContextItemsRender(item)</li>
                         }
                     </ul>
                 </div>
             }
         </div>
-        <div class="center-children">
-            <button type="button" class="btn btn-primary" @onclick=HideModal> Done </button>
-        </div>
-    </div>
 
+    </div>
+    <div class="container mt-3">
+        <label for="materialsadded">Items added</label>
+
+        @*List of the added Items *@
+        @if (ItemsToAdd is not null)
+        {
+            <div class="overflow-auto p-3 containerComponentHeight">
+                <ul class="list-group">
+                    @foreach (var item in ItemsToAdd)
+                    {
+                        <div class="row">
+                            <div class="col-11 ">
+                                <li class="list-group-item list-group-item-success">@ContextAddedItemsRender(item)</li>
+                            </div>
+
+                            <div class="col-1 container d-flex align-items-end justify-content-end">
+                                <button type="button" class="btn-close mb-2" @onclick=@(()=> ItemRemoveFromListClicked(item))></button>
+                            </div>
+                        </div>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
 </div>
 
 
 @code {
-
-    private bool showModal = false;
     /// <summary>
     /// list of Items we have from DB
     /// </summary>
@@ -69,10 +66,18 @@
     public List<T> ItemsToAdd { get; set; }
 
     /// <summary>
-    /// use ContextRender to show the value of the model by using @context
+    /// render the items
+    /// use @context to access the property
     /// </summary>
     [Parameter]
-    public RenderFragment<T> ContextRender{ get; set; }
+    public RenderFragment<T> ContextItemsRender{ get; set; }
+
+    /// <summary>
+    /// render the items has been added
+    /// use @context to access the property
+    /// </summary>
+    [Parameter]
+    public RenderFragment<T> ContextAddedItemsRender{ get; set; }
 
     /// <summary>
     /// Retrieve all Data From Data Base
@@ -89,8 +94,6 @@
     /// <param name="item">Item of Type T</param>
     private void ItemAddToListClicked(T item)
     {
-        // add the value from input to selected wagen
-
         if (ItemsToAdd is not null)
         {
             ItemsToAdd.Add(item);
@@ -118,34 +121,22 @@
             ItemsToAdd.Remove(item);
         }
     }
-
-
-    private void ShowModal()
+    
+    private async Task CloseModal()
     {
-        showModal = true;
+        Items = await ItemsData.GetAllAsync();
+        ItemsToAdd.Clear();
     }
-    private void HideModal()
-    {
-        showModal = false;
-    }
-    private void Save()
-    {
-        // Handle the saved data here
-        // You can use 'InputData' to get the value entered in the input field
-        // For example, you could raise an event to pass the data to the parent component
-        // or store it in a service, etc.
+    
 
-        // Close the modal after saving
-        HideModal();
-    }
-
-    #region Logic to search for Items
+    #region Logic to search in Items
 
     /// <summary>
     /// the text we add in text box
     /// </summary>
     private string inputText = string.Empty;
-    private string selectedmaterialsName = string.Empty;
+
+    private string selectedItemsName = string.Empty;
 
     /// <summary>
     /// delegate handelt the filter data
@@ -154,17 +145,17 @@
     public Func<T,bool> ItemsFilter{ get; set; }
 
     /// <summary>
-    /// Event triggerd when add text in Text Box to search for Items
-    /// need to add function handel the output from the seach bar
+    /// Event triggerd when add text in Text Box to search for Items.
+    /// need to add function handel .the output from the seach bar in example
     /// (Example) string? filterTyping;
     /// private void FilterOutPut(string data)
     /// {
     ///     filterTyping = data;
     /// }
     /// </summary>
-    
     [Parameter]
     public EventCallback<string> OnTypingFilter{ get; set; }
+
     // auto complete functions
     private async Task HandleInput(ChangeEventArgs e)
     {
@@ -179,7 +170,7 @@
         {
             Items = itemsData;
         }
-        else if (string.IsNullOrEmpty(selectedmaterialsName))
+        else if (string.IsNullOrEmpty(selectedItemsName))
         {
             Items = itemsData;
         }

@@ -47,7 +47,7 @@ Welcome to your new app.
     }
 </div>
 
-@if (!string.IsNullOrWhiteSpace(selectedmaterialsName))
+@* @if (!string.IsNullOrWhiteSpace(selectedmaterialsName))
 {
     <p class="mt-3">
         Selected materila is @selectedmaterialsName with ID <strong>@selectedmaterialsId</strong>
@@ -57,12 +57,38 @@ Welcome to your new app.
 <button class="btn btn-primary" @onclick="DownloadFileFromStream">
     Download File
 </button>
+ *@
+
+@* <button class="btn btn-primary" @onclick=ShowMaterialsDialog>Class Abstract</button> *@
+
+<ModalTransperent ButtonName="Add Wagens">
+    <ContextElements>
+        <AddItemsComponent T="SingleWagenModel" ItemsToAdd="@addedwagensList" ItemsFilter="@(x => x.Name.Contains(filterTyping, StringComparison.InvariantCultureIgnoreCase))" OnTypingFilter="FilterOutPut">
+            <ContextItemsRender>
+                @context.Name
+            </ContextItemsRender>
+            <ContextAddedItemsRender>
+                @context.Name
+            </ContextAddedItemsRender>
+        </AddItemsComponent>
+    </ContextElements>
+</ModalTransperent>
 
 
-<button class="btn btn-primary" @onclick=RetrieveDataFromClassLibrary>Class Abstract</button>
-
+<ModalTransperent ButtonName="Add Materials">
+    <ContextElements>
+        <AddItemsComponent T="MaterialsModel" ItemsToAdd="@addedmaterilasList" ItemsFilter="@(x => x.Name.Contains(filterTyping, StringComparison.InvariantCultureIgnoreCase))" OnTypingFilter="FilterOutPut">
+            <ContextItemsRender>
+                @context.Name
+            </ContextItemsRender>
+            <ContextAddedItemsRender>
+                @context.Name
+            </ContextAddedItemsRender>
+        </AddItemsComponent>
+    </ContextElements>
+</ModalTransperent>
 @code{
-
+    
     private ToastInformation TostInfo { get; set; }
     private ToastModel toast = new();
     private async Task ShowToastDialog()
@@ -188,10 +214,17 @@ Welcome to your new app.
     }
     #endregion
 
-    async Task RetrieveDataFromClassLibrary()
-    {
-        var bands = await dataBaseLibrary.GetAllAsync();
 
-        // await dataBaseLibrary.DeleteAsync("658552c50c03f55af1c7b78c");
+    private List<MaterialsModel> addedmaterilasList = new();
+    private List<SingleWagenModel> addedwagensList = new();
+    private SingleWagenModel singleWagen = new();
+    private List<MaterialsModel> materialsList;
+
+    string? filterTyping;
+
+    private void FilterOutPut(string data)
+    {
+        filterTyping = data;
     }
+
 }

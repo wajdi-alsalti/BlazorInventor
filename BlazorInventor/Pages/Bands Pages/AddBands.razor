@@ -6,28 +6,51 @@
 
 <h3>New Band</h3>
 <ToastInformation @ref=TostInfo Message=@Toast.ToastMessage Delay=@Toast.Delay Header=@Toast.ToastHeader ToastBg=@Toast.ToastBG />
-<EditForm Model="@newBand" OnValidSubmit="@AddNewBand">
+<EditForm Model="@newBand" OnValidSubmit="@AddNewBand" Context="NewBandAdded">
     <DataAnnotationsValidator />
     <ValidationSummary />
     <div class="row">
-        <div>
-
-            <div class="mb-3">
-                <label for="bandNumber">Band Number</label>
-                <InputNumber class="form-control" id="bandNumber" @bind-Value="newBand.Number"></InputNumber>
-            </div>
-            <AddWagenComponent wagensToAdd="@wagensToAdd"/>
+        @*input for the new band number*@
+        <div class="mb-3 col-9">
+            <label for="bandNumber">Band Number</label>
+            <InputNumber class="form-control" id="bandNumber" @bind-Value="newBand.Number"></InputNumber>
         </div>
+        @*component handel the list of items*@
+        <AddItemsComponent T="SingleWagenModel" ItemsToAdd="@wagensToAdd"
+                            ItemsFilter="@(x=>x.Name.Contains(filterTyping,StringComparison.InvariantCultureIgnoreCase))" 
+                            OnTypingFilter="FilterOutPut">
+            @*render the name of items*@
+            <ContextItemsRender>
+                @context.Name
+            </ContextItemsRender>
+            @*render the name of items has been added*@
+            <ContextAddedItemsRender>
+                <div class="row">
+                    @*name of items*@
+                    <div class="col-9">
+                        @context.Name
+                    </div>
+
+                    <div class="col-3">
+                        @*label*@
+                        <label for="wagenPosition">Wagen Position</label>
+                        @*select the wagen position*@
+                        <select class="form-select" @bind="@context.Position">
+                            @for (int position = 1; position < 10; position++)
+                            {
+                                <option>@position</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </ContextAddedItemsRender>
+        </AddItemsComponent>
+        
     </div>
     <button type="submit" class="btn btn-primary mt-3">Add Band</button>
 </EditForm>
 
 @code {
-
-    private ToastInformation TostInfo { get; set; }
-    private ToastModel Toast = new();
-
-
     /// <summary>
     /// list we have from DB
     /// </summary>
@@ -71,6 +94,8 @@
 
     }
 
+    private ToastInformation TostInfo { get; set; }
+    private ToastModel Toast = new();
     private async Task ShowToastDialog(string header, string message, string toastBG)
     {
         Toast.ToastHeader = header;
@@ -79,5 +104,12 @@
         Toast.Delay = 3000;
 
         await TostInfo.ShowToast();
+    }
+
+    string? filterTyping;
+
+    private void FilterOutPut(string data)
+    {
+        filterTyping = data;
     }
 }
