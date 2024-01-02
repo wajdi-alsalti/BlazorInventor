@@ -13,7 +13,7 @@
 
         @*Button to handle Data*@
         <div class="container d-flex align-items-center justify-content-center">
-            <button type="button" class="btn btn-primary w-50" @onclick=@Save> Done </button>
+            <button type="button" class="btn btn-primary w-50" @onclick=@Clicked> Done </button>
         </div>
     </div>
 </div>
@@ -24,13 +24,16 @@
     public string ButtonName { get; set; } = "Add";
 
     private bool showModal = false;
-    
+
 
     /// <summary>
     /// Render the elements inside the modal
     /// </summary>
     [Parameter]
     public RenderFragment ContextElements { get; set; }
+
+    [Parameter]
+    public EventCallback Clicked{ get; set; }
 
     private void ShowModal()
     {
@@ -40,17 +43,6 @@
     private void HideModal()
     {
         showModal = false;
-    }
-
-    private void Save()
-    {
-        // Handle the saved data here
-        // You can use 'InputData' to get the value entered in the input field
-        // For example, you could raise an event to pass the data to the parent component
-        // or store it in a service, etc.
-
-        // Close the modal after saving
-        HideModal();
     }
 }
 
