@@ -2,7 +2,6 @@
 
 @inject IDataAccessLibrary<SingleWagenModel> _singleWagen
 @inject IDataAccessLibrary<MaterialsModel> _materialsData
-
 <h3>AddWagen</h3>
 
 <ToastInformation @ref=TostInfo Message=@Toast.ToastMessage Delay=@Toast.Delay Header=@Toast.ToastHeader ToastBg=@Toast.ToastBG />
@@ -17,9 +16,11 @@
                     <InputText id="wagen" class="form-control" placeholder="Add Wagen name" @bind-Value=newWagenModel.Name />
                 </div>
                 
-                <AddItemsComponent T="MaterialsModel" ItemsToAdd="@addedmaterilasList" 
-                    ItemsFilter="@(x=>x.Name.Contains(filterTyping,StringComparison.InvariantCultureIgnoreCase))" 
-                    OnTypingFilter="FilterOutPut">
+                <AddItemsComponent T="MaterialsModel" 
+                                ItemsToAdd="@addedmaterilasList"
+                                ItemsFilter="@(x=>x.Name.Contains(filterTyping,StringComparison.InvariantCultureIgnoreCase))"
+                                GetData="@Givedata"
+                                OnTypingFilter="FilterOutPut">
                     <ContextItemsRender>
                         @context.Name
                     </ContextItemsRender>
@@ -39,11 +40,8 @@
 @code {
     private List<MaterialsModel> addedmaterilasList = new();
     private WagensUiModel newWagenModel = new();
-    
-    private async Task<List<MaterialsModel>> GetMaterials()
-    {
-        return await _materialsData.GetAllAsync();
-    }
+
+
 
     private async Task AddWagenDB()
     {
@@ -85,5 +83,10 @@
     private void FilterOutPut(string data)
     {
         filterTyping = data;
+    }
+
+    private Task<List<MaterialsModel>> Givedata()
+    {
+        return _materialsData.GetAllAsync();
     }
 }
