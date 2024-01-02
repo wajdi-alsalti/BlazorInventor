@@ -10,7 +10,8 @@ using DBInventorLibrary.Models.ControllerModels;
 using DBInventorLibrary.Models.Inventor;
 using DBInventorLibrary.Models.MaterialsModels;
 using DBInventorLibrary.Models.WagensModel;
-
+//using EntityDBClassLibrary;
+//using Microsoft.EntityFrameworkCore;
 using MongoDBConnectionClassLibrary.Data_Services;
 
 namespace BlazorInventor
@@ -32,6 +33,8 @@ namespace BlazorInventor
             builder.Services.AddSingleton<IDataAccessLibrary<InventorModel>, InventorMaterialsDataAbstract>();
             builder.Services.AddSingleton<IDataAccessLibrary<InventorControllers>, InventorControllersDataAbstract>();
 
+            // sql data base
+            //builder.Services.AddDbContext<EFContext>(option => option.UseSqlServer(builder.Configuration.GetSection("SqlInfo").GetConnectionString("SQL")));
             // for localization
 
             builder.Services.AddControllers();
