@@ -79,14 +79,21 @@
     private ToastInformation TostInfo { get; set; }
     private ToastModel ToastModel = new();
 
-    // id of the wagen
+    /// <summary>
+    /// id of the wagen we have, came from inventor index
+    /// </summary>
     [Parameter]
     public string Id { get; set; }
 
-    // ContollersId for the team who controlle the wagen
+    /// <summary>
+    /// ContollersId for the team who controlle the wagen, came from inventor index
+    /// </summary>
     [Parameter]
     public string ContollersId { get; set; }
 
+    /// <summary>
+    /// Wagen info from DB
+    /// </summary>
     private SingleWagenModel wagen;
 
     private List<MaterialsModel> materialsList = new();
@@ -206,14 +213,14 @@
 
         inventorItems.Controllers = await inventorControllers.GetByIdAsync(ContollersId);
         // to find out which band we controlled
-        var band = await bandData.GetByIdAsync(inventorItems.Controllers.Bands);
-        inventorItems.BandNumber = band.Number;
-        // look after the wagen position from band table and the id of wagen we have from the url
-        var wagenPosition = band.Wagens.Where(i => i.Id == wagen.Id).FirstOrDefault();
-        inventorItems.WagenPosition = wagenPosition.Position;
-        
-        inventorItems.WagenName = wagen.Name;
-        inventorItems.MaterialsControllerd = materialsControlled;
+        var band = inventorItems.Controllers.Bands;
+
+        // look after the wagen from band table ,and the id of wagen we have from the url
+        // to archive the wagen has been controlled
+        var wagenDeteted = band.Wagens.Where(i => i.Id == wagen.Id).FirstOrDefault();
+        inventorItems.WagenHasBeenControllerd = wagenDeteted;
+
+        inventorItems.MaterialsHasBeenControllerd = materialsControlled;
         inventorItems.HasBeenControllerd = true;
         await inventorInfo.AddNew(inventorItems);
     }
