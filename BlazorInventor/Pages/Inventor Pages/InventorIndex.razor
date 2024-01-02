@@ -1,44 +1,57 @@
 ﻿@page "/Inventor"
-@inject IDataAccessLibrary<ControllerModel> controllerData
-@inject IDataAccessLibrary<BandsModel> bandData
+
 @inject IDataAccessLibrary<InventorControllers> inventorControllers
-
-@*
-
-@inject IInventorControllerData inventorControllers
-*@
-
 
 @inject NavigationManager navManger
 
 <h3>Inventor Start Page</h3>
 
 <div class="container">
+    @*info about band*@
     @if (band is not null)
     {
         <h3> at band @band.Number</h3>
     }
 
+    @*info about Controllers*@
     @if (controllers is not null)
     {
         <h3>Controllers are :</h3>
-        @foreach (var controller in controllers.Controllers)
+        @foreach (var controller in controllers.ControllersTeam)
         {
             <h3>  @controller.Name  @controller.Number</h3>
         }
     }
 
-    <div class="container mb-2">
-            <select class="form-select" @bind="@PositionSelected">
-                <option value="">Select Position</option>
-                @for (int i = 1; i < 8; i++)
-                {
-                    <option value=@i>@i</option>
-                }
-            </select>
-    </div>
+    @*Select*@
+    @if (controllers is not null)
+    {
+        <div class="container mb-2">
+                <select class="form-select" @bind="@PositionSelected">
+                    <option value="">Select Position</option>
+                    @foreach (var position in SelectPositionBandHave())
+                    {
+                        <option value=@position>@position</option>
+                    }
+                </select>
+        </div>
+    }
     <div class="container d-flex align-items-center justify-content-center">
-        <button class="btn btn-primary" @onclick="NavigateToNextPage">Start</button>
+        <ModalTransperent ButtonName="Start Inventor" Clicked="Click">
+            <ContextElements>
+                <div>
+                    <h3>Wagens List at Position @PositionSelected</h3>
+                </div>
+                @foreach (var wagen in WagensListAtPosition(PositionSelected))
+                {
+                    <div class="overflow-auto p-2 containerComponentHeight">
+                        <ul class="list-group">
+                            <li class="@GetItemStyle(wagen)" role="button" @onclick=@(()=>SelectedWagen(wagen))>@wagen.Name</li>
+                        </ul>
+                    </div>
+                }
+            </ContextElements>
+        </ModalTransperent>
     </div>
 </div>
 @code {
@@ -47,33 +60,95 @@
 
     BandsModel band = new();
 
+    /// <summary>
+    /// the bind value from Select, that have the position value of the wagens position
+    /// </summary>
     string PositionSelected = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        var all = await inventorControllers.GetAllAsync();
-        // TODO find way to replace the id of the InventorControllers id to show need to login system
-        controllers = await inventorControllers.GetByIdAsync("656478c65cf57c8101a9f0c9");
+        // TODO find way to replace the id of the InventorControllers id to show need to login system the solution is by create a login system
+        controllers = await inventorControllers.GetByIdAsync("658c6fcb1168bd2498695642");
 
-        band = await bandData.GetByIdAsync(controllers.Bands);
+        band = controllers.Bands;
     }
 
-    protected void NavigateToNextPage()
+    /// <summary>
+    /// look after the wagens position in band and add position of the wagens in int list
+    /// </summary>
+    /// <returns>list of int have all the wagen positions in band</returns>
+    private List<int> SelectPositionBandHave()
     {
-        int intPoition = 0;
-        if (!string.IsNullOrEmpty(PositionSelected))
-        {
-            intPoition = int.Parse(PositionSelected);
-        }
-        var wagensWithPosition = band.Wagens.Where(x => x.Position == intPoition).ToList();
-        if (wagensWithPosition.Count == 1)
-        {
-            // navigate directly to inventor surevy with list of wagens
-            navManger.NavigateTo($"/InventorSurvey/{controllers.Id}/{wagensWithPosition.FirstOrDefault().Id}");
+        List<int> wagenPositions = new List<int>();
 
-        }else
+        // remove duplicates numbers from the list (because many wagens can be at same position)
+        wagenPositions = controllers.Bands.Wagens.Select(p => p.Position).Distinct().ToList();
+
+        // sort the numbers from small to bigger
+        wagenPositions.Sort();
+        return wagenPositions;
+    }
+
+    /// <summary>
+    /// look to the wagens have position from the select value
+    /// </summary>
+    /// <param name="position">string value from the select elemnt</param>
+    /// <returns>list of the wagens share same position</returns>
+    private List<BasicWagenModel> WagensListAtPosition(string position)
+    {
+        List<BasicWagenModel> wagensAtPositions = new List<BasicWagenModel>();
+        int result;
+        // if the position selected convert from string to int
+        if (int.TryParse(position, out result))
         {
-            //TODO navigate to page have a list of the wagens at same position
+            // look at the wagens that have the same positions
+            wagensAtPositions = controllers.Bands.Wagens.Where(x => x.Position == result).ToList();
+            return wagensAtPositions;
+        }
+        return new List<BasicWagenModel>();
+    }
+
+    /// <summary>
+    /// property hold the id wagen we select from the ModalTransperent
+    /// </summary>
+    string navigateToWagenWithId = string.Empty;
+
+    /// <summary>
+    ///  Keep track of the currently selected Wagen from the modal
+    /// </summary>
+    BasicWagenModel selectedWagenFromModal; // Keep track of the currently selected Wagen from the modal
+
+    private void SelectedWagen(BasicWagenModel wagen)
+    {
+        // Deselect the previously selected item
+        if (selectedWagenFromModal != null)
+        {
+            selectedWagenFromModal = null;
+        }
+
+        // Select the newly clicked item
+        selectedWagenFromModal = wagen;
+
+        navigateToWagenWithId = wagen.Id;
+
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// style the element we clicked
+    /// </summary>
+    /// <param name="wagen"></param>
+    /// <returns>new style for the element's clicked</returns>
+    string GetItemStyle(BasicWagenModel wagen)
+    {
+        return wagen == selectedWagenFromModal ? "list-group-item list-group-item-success text-info selectedWagenInModal " : "list-group-item list-group-item-secondary";
+    }
+
+    private void Click()
+    {
+        if (!string.IsNullOrEmpty(navigateToWagenWithId))
+        {
+            navManger.NavigateTo($"/InventorSurvey/{controllers.Id}/{navigateToWagenWithId}");
         }
     }
 }
