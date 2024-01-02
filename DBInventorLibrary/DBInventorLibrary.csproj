@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\EntityDBClassLibrary\EntityDBClassLibrary.csproj" />
     <ProjectReference Include="..\MongoDBConnectionClassLibrary\MongoDBConnectionClassLibrary.csproj" />
   </ItemGroup>
 

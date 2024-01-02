@@ -12,11 +12,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.14">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Localization" Version="7.0.13" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DBInventorLibrary\DBInventorLibrary.csproj" />
+    <ProjectReference Include="..\EntityDBClassLibrary\EntityDBClassLibrary.csproj" />
     <ProjectReference Include="..\MongoDBConnectionClassLibrary\MongoDBConnectionClassLibrary.csproj" />
   </ItemGroup>
 
