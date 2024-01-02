@@ -1,6 +1,7 @@
 ﻿@page "/WagenDetail/{Id}"
 
 @inject IDataAccessLibrary<SingleWagenModel> _wagenData
+@inject IDataAccessLibrary<MaterialsModel> _materialData
 <h3>@wagenDetails.Name Details</h3>
 
 
@@ -17,7 +18,11 @@
                 <div class="col-xl-3 pt-4">
                     <ModalTransperent ButtonName="Add New Materials">
                         <ContextElements>
-                            <AddItemsComponent T="MaterialsModel" ItemsToAdd="@addedmaterilasList" ItemsFilter="@(x => x.Name.Contains(filterTyping, StringComparison.InvariantCultureIgnoreCase))" OnTypingFilter="FilterOutPut">
+                            <AddItemsComponent T="MaterialsModel" 
+                                ItemsToAdd="@addedmaterilasList" 
+                                ItemsFilter="@(x => x.Name.Contains(filterTyping, StringComparison.InvariantCultureIgnoreCase))" 
+                                OnTypingFilter="FilterOutPut"
+                                GetData="GiveData">
                                 <ContextItemsRender>
                                     @context.Name
                                 </ContextItemsRender>
@@ -118,5 +123,10 @@
     private void FilterOutPut(string data)
     {
         filterTyping = data;
+    }
+
+    private async Task<List<MaterialsModel>> GiveData()
+    {
+        return await _materialData.GetAllAsync();
     }
 }
