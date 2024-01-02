@@ -8,7 +8,7 @@ namespace DBInventorLibrary.Models.ControllerModels
 
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
-        public List<ControllerModel> Controllers { get; set; }
-        public string Bands { get; set; }
+        public List<ControllerModel> ControllersTeam { get; set; }
+        public BandsModel Bands { get; set; }
     }
 }

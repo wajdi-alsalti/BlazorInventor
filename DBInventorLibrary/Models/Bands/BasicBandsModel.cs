@@ -1,19 +1,18 @@
 ﻿namespace DBInventorLibrary.Models.Bands
 {
-    public class BasiBandsModel
+    public class BasicBandsModel
     {
         public string Id { get; set; }
         public int BandNumer { get; set; }
         public int Position { get; set; }
-        public BasiBandsModel()
+        public BasicBandsModel()
         {
             
         }
-        public BasiBandsModel(BandsModel band)
+        public BasicBandsModel(BandsModel band)
         {
             Id = band.Id;
             BandNumer = band.Number;
-            //Position = band.Position ;
         }
     }
 }

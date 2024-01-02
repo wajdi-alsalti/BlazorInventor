@@ -1,5 +1,6 @@
 ﻿using DBInventorLibrary.Models.ControllerModels;
 using DBInventorLibrary.Models.MaterialsModels;
+using DBInventorLibrary.Models.WagensModel;
 
 namespace DBInventorLibrary.Models.Inventor
 {
@@ -10,10 +11,8 @@ namespace DBInventorLibrary.Models.Inventor
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
         public InventorControllers Controllers { get; set; }
-        public int BandNumber { get; set; }
-        public int WagenPosition { get; set; }
-        public string WagenName { get; set; }
-        public List<MaterialsModel> MaterialsControllerd { get; set; }
+        public BasicWagenModel WagenHasBeenControllerd { get; set; }
+        public List<MaterialsModel> MaterialsHasBeenControllerd { get; set; }
         public bool HasBeenControllerd { get; set; }
     }
 }
