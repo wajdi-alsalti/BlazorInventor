@@ -1,12 +1,17 @@
 ﻿@page "/BandDetail/{Id}"
 @inject IDataAccessLibrary<BandsModel> _bandData
+@inject IDataAccessLibrary<SingleWagenModel> _wagenData
 
 <h3>@bandDetail.Number Details</h3>
 <div class="container mb-3">
     <div class="float-end mt-4 ms-1">
         <ModalTransperent ButtonName="Add New Wagen">
             <ContextElements>
-                <AddItemsComponent T="SingleWagenModel" ItemsToAdd="@wagensToAdd" ItemsFilter="@(x => x.Name.Contains(filterTyping, StringComparison.InvariantCultureIgnoreCase))" OnTypingFilter="FilterOutPut">
+                <AddItemsComponent T="SingleWagenModel" 
+                                    ItemsToAdd="@wagensToAdd" 
+                                    ItemsFilter="@(x => x.Name.Contains(filterTyping, StringComparison.InvariantCultureIgnoreCase))" 
+                                    OnTypingFilter="FilterOutPut"
+                                    GetData="GiveData">
                     <ContextItemsRender>
                         @context.Name
                     </ContextItemsRender>
@@ -105,5 +110,10 @@
     private void FilterOutPut(string data)
     {
         filterTyping = data;
+    }
+
+    private async Task<List<SingleWagenModel>> GiveData()
+    {
+        return await _wagenData.GetAllAsync();
     }
 }

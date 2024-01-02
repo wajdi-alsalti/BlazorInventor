@@ -18,7 +18,8 @@
         @*component handel the list of items*@
         <AddItemsComponent T="SingleWagenModel" ItemsToAdd="@wagensToAdd"
                             ItemsFilter="@(x=>x.Name.Contains(filterTyping,StringComparison.InvariantCultureIgnoreCase))" 
-                            OnTypingFilter="FilterOutPut">
+                            OnTypingFilter="FilterOutPut"
+                            GetData="@GiveData">
             @*render the name of items*@
             <ContextItemsRender>
                 @context.Name
@@ -89,7 +90,7 @@
         // after we add the new band we clear the model and list to refresh the items
         newBand = new();
         wagensToAdd.Clear();
-        
+
         wagens = await _singleWagen.GetAllAsync();
 
     }
@@ -111,5 +112,10 @@
     private void FilterOutPut(string data)
     {
         filterTyping = data;
+    }
+
+    private async Task<List<SingleWagenModel>> GiveData()
+    {
+        return await _singleWagen.GetAllAsync();
     }
 }
