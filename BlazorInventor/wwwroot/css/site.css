@@ -155,3 +155,8 @@ ul.materialsAddedItems {
     padding: 20px;
 }
 
+/*style for inventor index page background the selected wagen in modal*/
+.selectedWagenInModal {
+    background-color: #C8E6FA;
+    border:1px solid;
+}
