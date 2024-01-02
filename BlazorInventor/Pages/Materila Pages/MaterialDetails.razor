@@ -116,20 +116,4 @@
 
 
     }
-    private async Task<bool> CheckIfItemSaved(MaterialsModel material)
-    {
-        var materialsInDB = await _materialsData.GetAllAsync();
-        // max number of the sapNumber in DB
-        var maxSapNumber = materialsInDB.Max(s => s.SapNumber);
-
-        var filterName = materialsInDB.Where(n => n.Name == material.Name).FirstOrDefault();
-        var filterSap = materialsInDB.Where(n => n.SapNumber == material.SapNumber).FirstOrDefault();
-        if (filterName is null && filterSap is null)
-        {
-            return true;
-        }
-        return false;
-    }
-
-
 }
