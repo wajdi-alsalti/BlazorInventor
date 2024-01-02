@@ -2,6 +2,7 @@
 
 @using System.IO
 @using System.Text
+@using EntityDBClassLibrary
 
 @inject IJSRuntime JS
 
@@ -12,7 +13,7 @@
 @inject IDataAccessLibrary<MaterialsModel> dataMaterials
 
 @inject IDataAccessLibrary<BandsModel> dataBaseLibrary
-
+@inject EFContext _context
 <PageTitle>Index</PageTitle>
 
 <h1>Hello, world!</h1>
@@ -63,7 +64,10 @@ Welcome to your new app.
 
 <ModalTransperent ButtonName="Add Wagens">
     <ContextElements>
-        <AddItemsComponent T="SingleWagenModel" ItemsToAdd="@addedwagensList" ItemsFilter="@(x => x.Name.Contains(filterTyping, StringComparison.InvariantCultureIgnoreCase))" OnTypingFilter="FilterOutPut">
+        <AddItemsComponent T="SingleWagenModel" ItemsToAdd="@addedwagensList" 
+            ItemsFilter="@(x => x.Name.Contains(filterTyping, StringComparison.InvariantCultureIgnoreCase))" 
+            OnTypingFilter="FilterOutPut"
+            GetData="GiveData">
             <ContextItemsRender>
                 @context.Name
             </ContextItemsRender>
@@ -75,7 +79,7 @@ Welcome to your new app.
 </ModalTransperent>
 
 
-<ModalTransperent ButtonName="Add Materials">
+@* <ModalTransperent ButtonName="Add Materials">
     <ContextElements>
         <AddItemsComponent T="MaterialsModel" ItemsToAdd="@addedmaterilasList" ItemsFilter="@(x => x.Name.Contains(filterTyping, StringComparison.InvariantCultureIgnoreCase))" OnTypingFilter="FilterOutPut">
             <ContextItemsRender>
@@ -86,9 +90,9 @@ Welcome to your new app.
             </ContextAddedItemsRender>
         </AddItemsComponent>
     </ContextElements>
-</ModalTransperent>
+</ModalTransperent> *@
 @code{
-    
+
     private ToastInformation TostInfo { get; set; }
     private ToastModel toast = new();
     private async Task ShowToastDialog()
@@ -105,6 +109,11 @@ Welcome to your new app.
     string? selectedmaterialsId;
     string? selectedmaterialsName;
     string? filter;
+
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     var wagenSql = _context.Materials.ToList();
+    // }
 
     async Task HandleInput(ChangeEventArgs e)
     {
@@ -158,12 +167,13 @@ Welcome to your new app.
         foreach (var item in materilasInventor)
         {
             // controllers name
-            controllersName = item.Controllers.Controllers.Select(n => n.Name).ToList();
+            controllersName = item.Controllers.ControllersTeam.Select(n => n.Name).ToList();
 
             // loop in MaterialsControllerd to have data
-            foreach (var material in item.MaterialsControllerd)
+            foreach (var material in item.MaterialsHasBeenControllerd)
             {
-                var line = $"{controllersName[0]} & {controllersName[1]},{item.BandNumber},{item.WagenName},{item.WagenPosition},{material.Name},{material.SapNumber},{material.Quantity}";
+                // var line = $"{controllersName[0]} & {controllersName[1]},{item.BandNumber},{item.WagenName},{item.WagenPosition},{material.Name},{material.SapNumber},{material.Quantity}";
+                var line = "";
                 csvLines.Add(line);
             }
         }
@@ -227,4 +237,8 @@ Welcome to your new app.
         filterTyping = data;
     }
 
+    private Task<List<SingleWagenModel>> GiveData()
+    {
+        return dataWagen.GetAllAsync();
+    }
 }
