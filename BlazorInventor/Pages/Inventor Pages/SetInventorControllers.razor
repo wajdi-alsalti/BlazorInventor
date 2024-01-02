@@ -10,7 +10,8 @@
     <div class="container mb-2">
         @if (BandsList is not null)
         {
-            <select @bind="@inventorControllers.Bands" class="form-select">
+            @*bind the id value of the selectd option in selectedBand id*@
+            <select @bind=@selectedBand.Id class="form-select">
                 <option value="">Select Band</option>
                 @foreach (var band in BandsList)
                 {
@@ -28,12 +29,10 @@
             </div>
             <div>
                 @if (ControllersList is not null)
-                @* @if (inventorControllers.Controllers is not null) *@
                 {
                     <div class="overflow-auto p-3 containerComponentHeight">
                         <ul class="list-group">
                             @foreach (var item in ControllersList)
-                            @* @foreach (var item in inventorControllers.Controllers) *@
                             {
                                 <li class="list-group-item list-group-item-primary" role="button" @onclick="(()=> ItemAddToListClicked(item))">@item.Name '@item.Number'</li>
                             }
@@ -74,8 +73,15 @@
 @code {
     InventorControllers inventorControllers = new();
 
+    /// <summary>
+    /// using in select band to capture the id value from select
+    /// </summary>
+    BandsModel selectedBand = new();
+
     List<ControllerModel> ControllersList;
+
     List<ControllerModel> ControllersListToInventor = new();
+
     List<BandsModel> BandsList;
     protected override async Task OnInitializedAsync()
     {
@@ -94,17 +100,21 @@
 
     private async Task AddControllersToInventor(EditContext context)
     {
-        inventorControllers.Controllers = ControllersListToInventor;
-        if (inventorControllers.Controllers.Count == 2)
+        inventorControllers.ControllersTeam = ControllersListToInventor;
+        // catch the id band from selectedBand
+        // fetch the band using id to retrive the data
+        inventorControllers.Bands = await bandsData.GetByIdAsync(selectedBand.Id);
+        if (inventorControllers.ControllersTeam.Count == 2)
         {
             var result = (InventorControllers)context.Model;
-            if (!string.IsNullOrEmpty(result.Bands))
+            // if we do not select band and try to add controllers the select value will be 0
+            if (result.Bands.Number != 0)
             {
                 await inventorControllerData.AddNew(result);
                 await RefreshList();
             }
 
-            //TODO after we create the team and the band need to controll 
+            
         }
     }
 
@@ -121,7 +131,7 @@
 
     private async Task RefreshList()
     {
-        var controllersInInventor = inventorControllers.Controllers;
+        var controllersInInventor = inventorControllers.ControllersTeam;
 
         // update the controller to add the true value to HassBeenAdded to true
         foreach (var controller in controllersInInventor)
@@ -155,6 +165,7 @@
             // number of controllers just 2
             if (ControllersListToInventor.Count < 2  )
             {
+                //TODO change the logic from add controller.HasBeenAdded = true; to add the cotroller to another db and compare how is not in table
                 controller.HasBeenAdded = true;
                 ControllersListToInventor.Add(controller);
                 
