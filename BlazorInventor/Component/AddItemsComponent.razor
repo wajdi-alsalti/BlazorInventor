@@ -1,7 +1,5 @@
 ﻿@typeparam T
 
-@inject IDataAccessLibrary<T> ItemsData
-
 <div class="container">
     @* search bar for Items *@
     <div class="autocomplete w-100">
@@ -55,12 +53,7 @@
 
 @code {
     /// <summary>
-    /// list of Items we have from DB
-    /// </summary>
-    public List<T> Items { get; set; }
-
-    /// <summary>
-    /// list of the Items we added to new Table DB
+    /// list of the Items we added . then add to new Table DB
     /// </summary>
     [Parameter]
     public List<T> ItemsToAdd { get; set; }
@@ -78,14 +71,39 @@
     /// </summary>
     [Parameter]
     public RenderFragment<T> ContextAddedItemsRender{ get; set; }
+    /// <summary>
+    /// delegate handelt the filter data
+    /// </summary>
+    [Parameter]
+    public Func<T, bool> ItemsFilter { get; set; }
 
     /// <summary>
-    /// Retrieve all Data From Data Base
+    /// Event triggerd when add text in Text Box to search for Items.
+    /// need to add function handel .the output from the seach bar in example
+    /// (Example) string? filterTyping;
+    /// private void FilterOutPut(string data)
+    /// {
+    ///     filterTyping = data;
+    /// }
     /// </summary>
-    /// <returns></returns>
+    [Parameter]
+    public EventCallback<string> OnTypingFilter { get; set; }
+
+    /// <summary>
+    /// call this event to retrieve the data and based to on OnInitializedAsync
+    /// </summary>
+    [Parameter]
+    public Func<Task<List<T>>> GetData { get; set; }
+
+    /// <summary>
+    /// list of Items we have from DB
+    /// </summary>
+    public List<T> Items { get; set; }
+
+    
     protected override async Task OnInitializedAsync()
     {
-        Items = await ItemsData.GetAllAsync();
+        Items = await GetData();
     }
 
     /// <summary>
@@ -121,13 +139,13 @@
             ItemsToAdd.Remove(item);
         }
     }
-    
+
     private async Task CloseModal()
     {
-        Items = await ItemsData.GetAllAsync();
+        Items = await GetData();
         ItemsToAdd.Clear();
     }
-    
+
 
     #region Logic to search in Items
 
@@ -138,28 +156,12 @@
 
     private string selectedItemsName = string.Empty;
 
-    /// <summary>
-    /// delegate handelt the filter data
-    /// </summary>
-    [Parameter]
-    public Func<T,bool> ItemsFilter{ get; set; }
-
-    /// <summary>
-    /// Event triggerd when add text in Text Box to search for Items.
-    /// need to add function handel .the output from the seach bar in example
-    /// (Example) string? filterTyping;
-    /// private void FilterOutPut(string data)
-    /// {
-    ///     filterTyping = data;
-    /// }
-    /// </summary>
-    [Parameter]
-    public EventCallback<string> OnTypingFilter{ get; set; }
+    
 
     // auto complete functions
     private async Task HandleInput(ChangeEventArgs e)
     {
-        var itemsData = await ItemsData.GetAllAsync();
+        var itemsData = await GetData();
         inputText = e.Value?.ToString();
         await OnTypingFilter.InvokeAsync(inputText);
         if (inputText?.Length >= 2)
